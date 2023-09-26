@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="render">
+      <UniqueIdentifier>{595892ae-14d7-4e1d-b8e6-f194e3d21e8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render\headers">
+      <UniqueIdentifier>{6725f513-ccf2-4630-b4b8-bd834c4fe0de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="misc">
+      <UniqueIdentifier>{8e949b63-bee5-4c2f-9949-5b6d61362f18}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_renderer.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="gl3w.c">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="gbuffer.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="errors.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_ui.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="render_target.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="asset.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="deferred_renderer.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_style.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="gbuffer.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="errors.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_ui.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helpers.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="render_target.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="asset.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
