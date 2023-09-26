@@ -11,6 +11,7 @@
 *.sln.docstates
 [Tt]extures/
 [Ff]onts/
+imgui.ini
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
