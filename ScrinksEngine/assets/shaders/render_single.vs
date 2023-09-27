@@ -1,5 +1,7 @@
 #version 330 core
-layout(location = 0) in vec4 data;
+layout(location = 0) in vec3 iPosition;
+layout(location = 1) in vec3 iNormal;
+layout(location = 2) in vec2 iTexCoord;
 
 out vec2 texCoord;
 out vec3 fragPos;
@@ -7,15 +9,16 @@ out vec3 normal;
 
 uniform mat4 projection;
 uniform mat4 model;
+uniform mat4 view;
 
 void main()
 {
-    vec4 worldPos = model * vec4(data.xy, 0.0, 0.5);
-    fragPos = worldPos.xyz;
-    texCoord = data.wz;
+    vec4 viewPos = model * view * vec4(iPosition, 1);
+    fragPos = viewPos.xyz;
+    texCoord = iTexCoord;
 
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-    normal = normalMatrix * vec3(0.0, 1.0, 0.0);
+    mat3 normalMatrix = transpose(inverse(mat3(model * view)));
+    normal = normalMatrix * iNormal;
 
-    gl_Position = projection * worldPos + vec4(normal * 0.1f, 0);
+    gl_Position = projection * viewPos;
 }

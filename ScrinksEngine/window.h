@@ -12,41 +12,33 @@
 #include "imgui_internal.h"
 
 #include "gbuffer.h"
+#include "camera.h"
 
 namespace scrinks
 {
-	class Renderer
+	class Window
 	{
 	public:
-		using ViewResizeCallback = std::function<void(int width, int height)>;
-
 		static bool init(int width, int height, const std::string& name);
 		static void shutdown();
 		static void run_loop();
 		static void set_vsync(bool enabled);
 		static bool is_vsync_enabled();
-		static void set_resize_callback(ViewResizeCallback callback);
-		static void resize_view(int width, int height);
-		static void resize_view_if_needed(int currentWidth, int currentHeight);
+
+		static void set_input_active(bool active);
 
 	public:
 		static int s_windowWidth;
 		static int s_windowHeight;
-		static int s_viewWidth;
-		static int s_viewHeight;
 
 	private:
-		static void handle_resize();
+		static void handle_input();
 		static bool setup_imgui();
 		static bool setup_glfw(int width, int height, const std::string& name);
-		static void render_gbuffer();
-		static void render_scene();
 
 		static GLFWwindow* s_window;
 		static bool s_vsync;
-		static bool s_resized;
-		static ViewResizeCallback s_viewResizeCallback;
-		static std::unique_ptr<render::GBuffer> s_gBuffer;
+		static bool s_inputActive;
 		static GLenum s_log_level;
 	};
 }

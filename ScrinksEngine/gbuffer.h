@@ -16,7 +16,8 @@ namespace scrinks::render
 		rgb16f,
 		rgba16f,
 		rgba,
-		depth
+		depth,
+		red
 	};
 
 	struct BufferDescriptor
@@ -43,6 +44,7 @@ namespace scrinks::render
 
 	public:
 		static Metadata get_format_meta_data(BufferFormat format);
+		static void bind(GLenum slot, const std::string bufferName);
 
 	public:
 		Buffer(Badge<BufferManager>, BufferDescriptor desc);
@@ -66,15 +68,19 @@ namespace scrinks::render
 		GBuffer(GLsizei width, GLsizei height);
 		~GBuffer();
 
+		void add_buffer(const std::string& name, BufferFormat format, GLuint attachment = GL_COLOR_ATTACHMENT0);
+		void setup_buffers();
+
 		void bind_write();
 		void bind_read();
-		void bind_textures();
+		GLuint bind_textures();
+
+	private:
 
 	private:
 		GLuint m_id;
-		std::shared_ptr<Buffer> m_posTexture;
-		std::shared_ptr<Buffer> m_normalTexture;
-		std::shared_ptr<Buffer> m_albedoTexture;
-		std::shared_ptr<Buffer> m_depthTexture;
+		std::vector<std::shared_ptr<Buffer>> m_buffers;
+		GLuint m_colorBufferCount;
+		GLsizei m_width, m_height;
 	};
 }

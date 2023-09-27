@@ -41,6 +41,7 @@ namespace scrinks::render
 		void mark_for_removal(const std::string& name);
 		void reload_all();
 		void for_each(std::function<void(const std::string& name, std::shared_ptr<T_Asset>)> func);
+		void for_each_name(std::function<void(const std::string& name)> func);
 
 	public:
 		static AssetManager& instance();
@@ -60,6 +61,10 @@ namespace scrinks::render
 		const T_Descriptor& description
 	)
 	{
+		const auto itr{ m_store.find(name) };
+		if (itr != m_store.end())
+			return itr->second.second;
+
 		const auto asset{ load(description) };
 
 		// Only replace if the asset is actually loaded
@@ -117,6 +122,13 @@ namespace scrinks::render
 	{
 		for (auto& [name, entry] : m_store)
 			func(name, entry.second);
+	}
+
+	template<typename T_Descriptor, typename T_Asset>
+	void AssetManager<T_Descriptor, T_Asset>::for_each_name(std::function<void(const std::string& name)> func)
+	{
+		for (auto& [name, _] : m_store)
+			func(name);
 	}
 
 	template<typename T_Descriptor, typename T_Asset>

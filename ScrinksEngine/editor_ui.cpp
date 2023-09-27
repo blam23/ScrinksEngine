@@ -1,10 +1,12 @@
 #include "editor_ui.h"
 #include "debug.h"
 #include "imgui_style.h"
-#include "deferred_renderer.h"
+#include "window.h"
 #include "shader.h"
 #include "texture.h"
+#include "model.h"
 #include "gbuffer.h"
+#include "pipeline.h"
 #include "glm/glm.hpp"
 
 using namespace scrinks;
@@ -13,13 +15,37 @@ bool requestVsync{ true };
 ImColor info_regular{ ImColor{ 230, 230, 230 } };
 ImColor info_highlight{ ImColor{ 120, 230, 230 } };
 int dbgTextureID{ 0 };
+bool unFocusGame{ true };
 
-std::vector<std::string> textureNameCache{};
-std::vector<std::string> bufferNameCache{};
-std::vector<std::string> shaderNameCache{};
+editor::AssetNameCache<render::TextureManager> textureNameCache{};
+editor::AssetNameCache<render::BufferManager>  bufferNameCache{};
+editor::AssetNameCache<render::ShaderManager>  shaderNameCache{};
 
-void render_viewport(GLuint renderedSceneTexture)
+float timeSinceRefresh = 0.0f;
+int refreshIndex = 0;
+void refresh_caches_as_needed(ImGuiIO& io, float interval = 100)
 {
+    timeSinceRefresh += io.DeltaTime;
+    if (timeSinceRefresh < interval / 1000.0f)
+        return;
+
+    timeSinceRefresh = 0;
+
+    switch (refreshIndex)
+    {
+        case 0: textureNameCache.refresh(); break;
+        case 1: bufferNameCache.refresh(); break;
+        case 2: shaderNameCache.refresh(); break;
+        default: refreshIndex = 0; break;
+    }
+
+    refreshIndex++;
+}
+
+void render_viewport()
+{
+    std::shared_ptr<render::Buffer> viewport{ render::BufferManager::instance().get("viewport") };
+        
     ImGuiID id = ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_PassthruCentralNode, nullptr);
     ImGuiDockNode* node = ImGui::DockBuilderGetCentralNode(id);
 
@@ -31,12 +57,25 @@ void render_viewport(GLuint renderedSceneTexture)
 
     ImGui::Begin("Viewport", nullptr);
     {
-        if (renderedSceneTexture > 0)
-        {
-            ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            ImGui::Image((void*)(intptr_t)renderedSceneTexture, ImVec2{ viewportPanelSize.x, viewportPanelSize.y });
+        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+        render::Pipeline::resize_if_needed((int)viewportPanelSize.x, (int)viewportPanelSize.y);
 
-            Renderer::resize_view_if_needed((int)viewportPanelSize.x, (int)viewportPanelSize.y);
+        if (viewport && viewport->id() > 0)
+        {
+            const bool focused{ ImGui::IsWindowFocused() };
+
+            if (focused && unFocusGame)
+                ImGui::SetWindowFocus("Debug");
+
+            Window::set_input_active(focused);
+
+            ImGui::Image((void*)(intptr_t)viewport->id(), ImVec2{ viewportPanelSize.x, viewportPanelSize.y });
+
+            if (focused)
+            {
+                ImVec2 bl{ node->Pos.x + viewportPanelSize.x, node->Pos.y + viewportPanelSize.y };
+                ImGui::GetForegroundDrawList()->AddRect(node->Pos, bl, IM_COL32(255, 0, 0, 200), 0, 0, 2.0f);
+            }
         }
     }
 
@@ -44,9 +83,26 @@ void render_viewport(GLuint renderedSceneTexture)
     ImGui::End();
 }
 
+float fov{ 90.0f };
+void show_camera_info()
+{
+    ImGui::Begin("Camera");
+    {
+        auto& camera = render::Pipeline::camera();
+
+        if (ImGui::DragFloat("FoV", &fov))
+            camera.set_fov(fov);
+
+        ImGui::Text("pos { %.3f, %.3f, %.3f }", camera.pos().x, camera.pos().y, camera.pos().z);
+        ImGui::Text("dir { %.3f, %.3f, %.3f }", camera.forward().x, camera.forward().y, camera.forward().z);
+    }
+    ImGui::End();
+}
+
+
 void editor::init()
 {
-    gui::set_style_material_blue();
+    gui::set_style_large_mat_blue();
 
     debug::register_test_float("testA", 0.0f);
     debug::register_test_float("testB", 0.0f);
@@ -54,40 +110,37 @@ void editor::init()
     debug::register_test_float("testD", 0.0f);
 }
 
-void editor::render_ui(GLuint renderedSceneTexture)
+void editor::render_ui()
 {
-    bool vsyncEnabled = Renderer::is_vsync_enabled();
+    bool vsyncEnabled = Window::is_vsync_enabled();
     auto& io = ImGui::GetIO();
+
+    unFocusGame = ImGui::IsKeyDown(ImGuiKey::ImGuiKey_Escape);
+
+    refresh_caches_as_needed(io);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    render_viewport(renderedSceneTexture);
+    render_viewport();
 
     ImGui::BeginMainMenuBar();
     {
-        if (ImGui::MenuItem("Reload"))
+        if (ImGui::MenuItem("Reload All"))
         {
-           render::ShaderManager::instance().reload_all();
+            render::ShaderManager::instance().reload_all();
+            render::ModelManager::instance().reload_all();
+            render::TextureManager::instance().reload_all();
+
+            render::Pipeline::force_recreate();
         }
 
-        if (ImGui::BeginMenu("Menu"))
+        if (ImGui::MenuItem("Reload Shaders"))
         {
-            if (ImGui::MenuItem("Quit", "alt+f4"))
-                exit(0);
-            ImGui::EndMenu();
-        }
+            render::ShaderManager::instance().reload_all();
 
-        if (ImGui::BeginMenu("Theme"))
-        {
-            if (ImGui::MenuItem("Dark"))
-                gui::set_style_dark();
-
-            if (ImGui::MenuItem("Blue"))
-                gui::set_style_material_blue();
-
-            ImGui::EndMenu();
+            render::Pipeline::force_recreate();
         }
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 235);
@@ -95,11 +148,13 @@ void editor::render_ui(GLuint renderedSceneTexture)
         ImGui::EndMainMenuBar();
     }
 
+    show_camera_info();
+
     ImGui::Begin("Debug");
     {
         for (auto& [name, value] : debug::get_all_test_floats())
         {
-            ImGui::SliderFloat(name.c_str(), &value, -2.f, 2.0f);
+            ImGui::DragFloat(name.c_str(), &value);
             ImGui::Spacing();
         }
     }
@@ -110,31 +165,21 @@ void editor::render_ui(GLuint renderedSceneTexture)
         ImGui::Checkbox("Vsync", &requestVsync);
         if (requestVsync != vsyncEnabled)
         {
-            Renderer::set_vsync(requestVsync);
+            Window::set_vsync(requestVsync);
         }
     }
     ImGui::End();
 
     if(ImGui::Begin("Textures"))
     {
-        if (ImGui::Button("Refresh"))
-        {
-            textureNameCache.clear();
-            render::TextureManager::instance().for_each(
-                [] (const std::string name, std::shared_ptr<render::Texture>) -> void
-                {
-                    textureNameCache.push_back(name);
-                }
-            );
-        }
-
         static int chosen{ 1 };
         ImGui::PushItemWidth(-1);
         int count{ (int)textureNameCache.size() };
         static std::shared_ptr<render::Texture> displayTexture{ nullptr };
-        if(count > 0 && ImGui::BeginCombo("##", textureNameCache[chosen].data()))
+        if(count > 0)
         {
-            if (chosen < count)
+            chosen %= count;
+            if (ImGui::BeginCombo("##", textureNameCache[chosen].data()))
             {
                 int n{ 0 };
                 for (const auto& name : textureNameCache)
@@ -146,8 +191,8 @@ void editor::render_ui(GLuint renderedSceneTexture)
                     }
                     n++;
                 }
+                ImGui::EndCombo();
             }
-            ImGui::EndCombo();
         }
         ImGui::PopItemWidth();
 
@@ -161,24 +206,14 @@ void editor::render_ui(GLuint renderedSceneTexture)
 
     if (ImGui::Begin("Buffers"))
     {
-        if (ImGui::Button("Refresh"))
-        {
-            bufferNameCache.clear();
-            render::BufferManager::instance().for_each(
-                [] (const std::string name, std::shared_ptr<render::Buffer>) -> void
-                {
-                    bufferNameCache.push_back(name);
-                }
-            );
-        }
-
         static int chosen{ 1 };
         static std::shared_ptr<render::Buffer> displayBuffer{ nullptr };
         ImGui::PushItemWidth(-1);
         int count{ (int)bufferNameCache.size() };
-        if (count > 0 && ImGui::BeginCombo("##", bufferNameCache[chosen].data()))
+        if (count > 0)
         {
-            if (chosen < count)
+            chosen %= count;
+            if (ImGui::BeginCombo("##", bufferNameCache[chosen].data()))
             {
                 int n{ 0 };
                 for (const auto& name : bufferNameCache)
@@ -190,8 +225,8 @@ void editor::render_ui(GLuint renderedSceneTexture)
                     }
                     n++;
                 }
+                ImGui::EndCombo();
             }
-            ImGui::EndCombo();
         }
         ImGui::PopItemWidth();
 
@@ -205,17 +240,6 @@ void editor::render_ui(GLuint renderedSceneTexture)
 
     if (ImGui::Begin("Shaders"))
     {
-        if (ImGui::Button("Refresh"))
-        {
-            shaderNameCache.clear();
-            render::ShaderManager::instance().for_each(
-                [](const std::string name, std::shared_ptr<render::Shader>) -> void
-                {
-                    shaderNameCache.push_back(name);
-                }
-            );
-        }
-
         bool ignoreSelect;
         ImGui::PushItemWidth(-1);
         if(ImGui::BeginListBox("##hidelabel"))
@@ -232,7 +256,7 @@ void editor::render_ui(GLuint renderedSceneTexture)
 
     ImGui::Render();
 
-    glViewport(0, 0, Renderer::s_windowWidth, Renderer::s_windowHeight);
+    glViewport(0, 0, Window::s_windowWidth, Window::s_windowHeight);
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 

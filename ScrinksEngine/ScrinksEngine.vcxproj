@@ -140,28 +140,45 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="asset.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="editor_ui.cpp" />
     <ClCompile Include="errors.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="model.cpp" />
     <ClCompile Include="gbuffer.cpp" />
     <ClCompile Include="gl3w.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="deferred_renderer.cpp" />
+    <ClCompile Include="window.cpp" />
+    <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="pass_light.cpp" />
+    <ClCompile Include="pipeline.cpp" />
+    <ClCompile Include="pass_geometry.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="render_target.cpp" />
+    <ClCompile Include="pass_ssao.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asset.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="default_pipeline.h" />
     <ClInclude Include="editor_ui.h" />
     <ClInclude Include="errors.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="gbuffer.h" />
-    <ClInclude Include="deferred_renderer.h" />
+    <ClInclude Include="window.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="imgui_style.h" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="pass_light.h" />
+    <ClInclude Include="pipeline.h" />
+    <ClInclude Include="pass_geometry.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="render_target.h" />
+    <ClInclude Include="pass_ssao.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

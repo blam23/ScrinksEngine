@@ -1,0 +1,25 @@
+#pragma once
+
+#include "helpers.h"
+#include "asset.h"
+#include "mesh.h"
+
+#include <string>
+
+namespace scrinks::render
+{
+	class Model;
+	using ModelDescription = std::string;
+	using ModelManager = AssetManager<ModelDescription, Model>;
+
+	class Model : public Asset
+	{
+	public:
+		Model(Badge<ModelManager>, std::vector<Mesh>&& meshes);
+
+		void draw(std::shared_ptr<Shader> shader) const;
+
+	private:
+		std::vector<Mesh> m_meshes;
+	};
+}

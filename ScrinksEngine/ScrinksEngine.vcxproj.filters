@@ -18,12 +18,24 @@
     <Filter Include="misc">
       <UniqueIdentifier>{8e949b63-bee5-4c2f-9949-5b6d61362f18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{e40bb4de-5e8e-462a-a078-a7215fa72a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game\headers">
+      <UniqueIdentifier>{9427dfa8-2deb-490a-825e-dc26974102fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render\headers\render_passes">
+      <UniqueIdentifier>{0d9f4614-009b-4d09-8341-bf583b41101f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render\render_passes">
+      <UniqueIdentifier>{c48772ce-36ac-48c3-9d5e-40b6cf174bfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>main</Filter>
     </ClCompile>
-    <ClCompile Include="deferred_renderer.cpp">
+    <ClCompile Include="window.cpp">
       <Filter>render</Filter>
     </ClCompile>
     <ClCompile Include="gl3w.c">
@@ -53,9 +65,33 @@
     <ClCompile Include="texture.cpp">
       <Filter>render</Filter>
     </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="pass_geometry.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
+    <ClCompile Include="pass_ssao.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
+    <ClCompile Include="pipeline.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="pass_light.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="deferred_renderer.h">
+    <ClInclude Include="window.h">
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="imgui_style.h">
@@ -87,6 +123,33 @@
     </ClInclude>
     <ClInclude Include="asset.h">
       <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>game\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pipeline.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_ssao.h">
+      <Filter>render\headers\render_passes</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_geometry.h">
+      <Filter>render\headers\render_passes</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_light.h">
+      <Filter>render\headers\render_passes</Filter>
+    </ClInclude>
+    <ClInclude Include="default_pipeline.h">
+      <Filter>render\headers\render_passes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

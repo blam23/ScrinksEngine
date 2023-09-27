@@ -1,9 +1,9 @@
-#include "deferred_renderer.h"
+#include "window.h"
 
 int main()
 {
-    if (scrinks::Renderer::init(1024, 720, "Test"))
-        scrinks::Renderer::run_loop();
+    if (scrinks::Window::init(1920, 1080, "Scrinks!"))
+        scrinks::Window::run_loop();
     
-    scrinks::Renderer::shutdown();
+    scrinks::Window::shutdown();
 }

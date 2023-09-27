@@ -7,14 +7,14 @@ in vec2 texCoord;
 in vec3 fragPos;
 in vec3 normal;
 
-uniform sampler2D albedoTex;
-uniform sampler2D normalTex;
-uniform sampler2D depthTex;
+uniform sampler2D tex1;
+uniform sampler2D tex2;
+
+uniform float testA;
 
 void main()
 {
-    gAlbedo = texture(albedoTex, texCoord);
-    gAlbedo.a = 1.0;
-    gPosition = fragPos * texture(depthTex, texCoord).r;
-    gNormal = normal * texture(albedoTex, texCoord).rgb;
+    gAlbedo = texture(tex1, texCoord);
+    gPosition = fragPos.xyz;
+    gNormal = normalize(normal);
 }
