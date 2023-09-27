@@ -1,5 +1,6 @@
 #pragma once
 
+#include "effect_pass.h"
 #include "pipeline.h"
 #include "shader.h"
 #include "render_target.h"
@@ -10,16 +11,16 @@
 
 namespace scrinks::render::pass
 {
-	class SSAO : public RenderPass
+	class SSAO : public EffectPass
 	{
 	public:
-		SSAO() {}
+		SSAO();
 		~SSAO() override;
 
 	public:
 		void configure_kernel_count(size_t kernels);
-		void init() override;
-		void draw() override;
+		void load_assets() override;
+		void setup_draw() override;
 
 	private:
 		void generate_noise_texture();
@@ -29,10 +30,17 @@ namespace scrinks::render::pass
 		std::vector<glm::vec3> m_kernel{};
 		GLuint m_noiseTexture{ 0 };
 		size_t m_kernels_requested{ 64 };
-		std::shared_ptr<Shader> m_shader{ nullptr };
-		std::unique_ptr<RenderTarget> m_target{ nullptr };
+	};
 
-		void resize(GLsizei width, GLsizei height) override;
+	class SSAOBlur : public EffectPass
+	{
+	public:
+		SSAOBlur();
+		~SSAOBlur() override;
+
+	public:
+		void load_assets() override;
+		void setup_draw() override;
 	};
 }
 

@@ -11,8 +11,6 @@ uniform vec3 samples[64];
 
 // parameters (you'd probably want to use them as uniforms to more easily tweak the effect)
 int kernelSize = 64;
-const float bias = 0.009;
-const float radius = 0.08;
 
 // tile noise texture over screen based on screen dimensions divided by noise size
 
@@ -20,6 +18,9 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform int screenWidth;
 uniform int screenHeight;
+
+const float bias = 0.005;
+const float radius = 0.2;
 
 void main()
 {
@@ -35,11 +36,12 @@ void main()
     mat3 TBN = mat3(tangent, bitangent, normal);
     // iterate over the sample kernel and calculate occlusion factor
     float occlusion = 0.0;
+    
     for(int i = 0; i < kernelSize; ++i)
     {
         // get sample position
         vec3 samplePos = TBN * samples[i]; // from tangent to view-space
-        samplePos = fragPos + samplePos * radius; 
+        samplePos = fragPos + samplePos * radius;
         
         // project sample position (to sample texture) (to get position on screen/texture)
         vec4 offset = vec4(samplePos, 1.0);

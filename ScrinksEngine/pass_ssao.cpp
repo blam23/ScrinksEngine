@@ -7,6 +7,11 @@ using namespace scrinks::render::pass;
 std::uniform_real_distribution<float> s_randomFloat{ 0.0, 1.0 };
 std::default_random_engine s_generator{};
 
+SSAO::SSAO()
+	: EffectPass{ "ssao_raw", render::BufferFormat::red }
+{
+}
+
 SSAO::~SSAO()
 {
 	if (m_noiseTexture != 0)
@@ -29,7 +34,7 @@ float lerp(float a, float b, float t)
 	return a + t * (b - a);
 }
 
-void SSAO::init()
+void SSAO::load_assets()
 {
 	m_kernel.clear();
 	m_kernel.reserve(m_kernels_requested);
@@ -74,40 +79,31 @@ void SSAO::send_data_to_shader()
 	}
 }
 
-void SSAO::draw()
+void SSAO::setup_draw()
 {
-	m_target->bind_write();
-	{
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
+	if (!m_shader || m_shader->is_outdated())
+		m_shader = render::ShaderManager::instance().get("ssao");
 
-		if (!m_shader || m_shader->is_outdated())
-			m_shader = render::ShaderManager::instance().get("ssao");
+	m_shader->use_program();
+	m_shader->set_param("screenWidth", Pipeline::view_width());
+	m_shader->set_param("screenHeight", Pipeline::view_height());
+	m_shader->set_param("projection", Pipeline::projection());
+	m_shader->set_param("view", Pipeline::camera().view());
+	m_shader->set_param("gPosition", 0);
+	m_shader->set_param("gNormal", 1);
+	m_shader->set_param("texNoise", 2);
+	m_shader->set_param("radius", *debug::get_test_float("radius"));
+	m_shader->set_param("bias",   *debug::get_test_float("bias"));
+	m_shader->set_param("testA",  *debug::get_test_float("testA"));
+	m_shader->set_param("testB",  *debug::get_test_float("testB"));
+	m_shader->set_param("testC",  *debug::get_test_float("testC"));
+	m_shader->set_param("testD",  *debug::get_test_float("testD"));
+	send_data_to_shader();
 
-		m_shader->use_program();
-		m_shader->set_param("screenWidth", Pipeline::view_width());
-		m_shader->set_param("screenHeight", Pipeline::view_height());
-		m_shader->set_param("projection", Pipeline::projection());
-		m_shader->set_param("view", Pipeline::camera().view());
-		m_shader->set_param("gPosition", 0);
-		m_shader->set_param("gNormal", 1);
-		m_shader->set_param("texNoise", 2);
-		m_shader->set_param("radius", *debug::get_test_float("radius"));
-		m_shader->set_param("bias",   *debug::get_test_float("bias"));
-		m_shader->set_param("testA",  *debug::get_test_float("testA"));
-		m_shader->set_param("testB",  *debug::get_test_float("testB"));
-		m_shader->set_param("testC",  *debug::get_test_float("testC"));
-		m_shader->set_param("testD",  *debug::get_test_float("testD"));
-		send_data_to_shader();
-
-		Buffer::bind(GL_TEXTURE0, "position");
-		Buffer::bind(GL_TEXTURE1, "normal");
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, m_noiseTexture);
-
-		Pipeline::fullscreen_quad();
-	}
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	Buffer::bind(GL_TEXTURE0, "position");
+	Buffer::bind(GL_TEXTURE1, "normal");
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_noiseTexture);
 }
 
 void SSAO::generate_noise_texture()
@@ -136,7 +132,32 @@ void SSAO::generate_noise_texture()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void SSAO::resize(GLsizei width, GLsizei height)
+SSAOBlur::SSAOBlur()
+	: EffectPass{ "ssao", render::BufferFormat::red }
 {
-	m_target = std::make_unique<render::RenderTarget>("ssao", render::BufferFormat::red, width, height);
 }
+
+SSAOBlur::~SSAOBlur()
+{
+	RenderPass::~RenderPass();
+}
+
+void SSAOBlur::load_assets()
+{
+	m_shader = render::ShaderManager::instance().load_and_store
+	(
+		"ssao_blur",
+		{ "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao_blur.fs" }
+	);
+}
+
+void SSAOBlur::setup_draw()
+{
+	if (!m_shader || m_shader->is_outdated())
+		m_shader = render::ShaderManager::instance().get("ssao_blur");
+
+	m_shader->use_program();
+	Buffer::bind(GL_TEXTURE0, "ssao_raw");
+	m_shader->set_param("ssao_raw", 0);
+}
+

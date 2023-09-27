@@ -11,6 +11,7 @@ namespace scrinks::render
 	{
 		render::Pipeline::register_pass<render::pass::Geometry>();
 		render::Pipeline::register_pass<render::pass::SSAO>();
+		render::Pipeline::register_pass<render::pass::SSAOBlur>();
 		render::Pipeline::register_pass<render::pass::DeferredLighting>();
 	}
 }

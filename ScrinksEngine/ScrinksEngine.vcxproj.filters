@@ -89,6 +89,9 @@
     <ClCompile Include="pass_light.cpp">
       <Filter>render\render_passes</Filter>
     </ClCompile>
+    <ClCompile Include="effect_pass.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -149,6 +152,9 @@
       <Filter>render\headers\render_passes</Filter>
     </ClInclude>
     <ClInclude Include="default_pipeline.h">
+      <Filter>render\headers\render_passes</Filter>
+    </ClInclude>
+    <ClInclude Include="effect_pass.h">
       <Filter>render\headers\render_passes</Filter>
     </ClInclude>
   </ItemGroup>

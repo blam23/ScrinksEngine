@@ -143,6 +143,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="editor_ui.cpp" />
+    <ClCompile Include="effect_pass.cpp" />
     <ClCompile Include="errors.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="model.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="debug.h" />
     <ClInclude Include="default_pipeline.h" />
     <ClInclude Include="editor_ui.h" />
+    <ClInclude Include="effect_pass.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gbuffer.h" />
