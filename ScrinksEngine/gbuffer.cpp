@@ -127,18 +127,3 @@ void GBuffer::bind_read()
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id);
 }
 
-GLuint GBuffer::bind_textures()
-{
-	for (const auto& buffer : m_buffers)
-	{
-		const auto attachment{ buffer->attachment() };
-		if (attachment >= GL_COLOR_ATTACHMENT0 && attachment <= GL_COLOR_ATTACHMENT31)
-		{
-			glActiveTexture(GL_TEXTURE0 + (attachment - GL_COLOR_ATTACHMENT0));
-			glBindTexture(GL_TEXTURE_2D, buffer->id());
-		}
-	}
-
-	return m_colorBufferCount;
-}
-

@@ -73,8 +73,6 @@ namespace scrinks::render
 
 		void bind_write();
 		void bind_read();
-		GLuint bind_textures();
-
 	private:
 
 	private:
