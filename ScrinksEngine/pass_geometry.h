@@ -12,7 +12,7 @@ namespace scrinks::render::pass
 		~Geometry() override;
 
 	public:
-		void init() override;
+		void init();
 		void draw() override;
 
 	private:

@@ -15,7 +15,7 @@ namespace scrinks::render
 		DISABLE_COPY(RenderTarget);
 
 	public:
-		RenderTarget(const std::string name, BufferFormat format, GLint width, GLint height);
+		RenderTarget(const std::string name, BufferFormat format, GLint width, GLint height, GLenum attachment = GL_COLOR_ATTACHMENT0);
 
 	public:
 		void bind_write();

@@ -38,6 +38,15 @@ namespace scrinks::render
 		bool m_requiresRecalc{ false };
 	};
 
+	class IsoCamera : public Camera
+	{
+	public:
+		IsoCamera(float scale);
+	private:
+
+		float m_scale;
+	};
+
 	class FPSCamera : public Camera
 	{
 	public:

@@ -8,7 +8,6 @@
 namespace scrinks::render
 {
 	class RenderPass;
-	using RenderPassId = std::size_t;
 
 	class Pipeline
 	{
@@ -23,7 +22,7 @@ namespace scrinks::render
 		static void fullscreen_quad();
 
 		template <typename T_Pass>
-		static RenderPassId register_pass();
+		static T_Pass* register_pass();
 
 	public:
 		static GBuffer* gbuffer();
@@ -51,29 +50,22 @@ namespace scrinks::render
 		virtual ~RenderPass() {}
 
 	public:
-		virtual void init() { m_initialised = true; }
 		virtual void draw() = 0;
-
-	public:
-		static constexpr RenderPassId InvalidPassId{ (std::numeric_limits<std::uint32_t>::max)() };
 
 	protected:
 		RenderPass() = default;
-		bool m_initialised{ false };
 
 	private:
 		virtual void resize(GLsizei width, GLsizei height) = 0;
 
-		RenderPassId m_id{ InvalidPassId };
 		friend Pipeline;
 	};
 
 	template <typename T_Pass>
-	RenderPassId Pipeline::register_pass()
+	T_Pass* Pipeline::register_pass()
 	{
 		s_passes.push_back(std::make_unique<T_Pass>());
 		size_t index{ s_passes.size() - 1 };
-		s_passes[index]->init();
-		return index;
+		return (T_Pass*)s_passes[index].get();
 	}
 }

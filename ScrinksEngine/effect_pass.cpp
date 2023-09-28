@@ -11,7 +11,6 @@ EffectPass::EffectPass(const std::string& bufferName, const render::BufferFormat
 void EffectPass::init()
 {
     load_assets();
-    RenderPass::init();
 }
 
 void EffectPass::draw()
@@ -32,6 +31,6 @@ void EffectPass::draw()
 
 void EffectPass::resize(GLsizei width, GLsizei height)
 {
-    m_target = std::make_unique<render::RenderTarget>(m_bufferName, render::BufferFormat::rgb, width, height);
+    m_target = std::make_unique<render::RenderTarget>(m_bufferName, m_bufferFormat, width, height);
 }
 

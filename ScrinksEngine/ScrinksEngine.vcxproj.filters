@@ -18,17 +18,26 @@
     <Filter Include="misc">
       <UniqueIdentifier>{8e949b63-bee5-4c2f-9949-5b6d61362f18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="game">
-      <UniqueIdentifier>{e40bb4de-5e8e-462a-a078-a7215fa72a6d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="game\headers">
-      <UniqueIdentifier>{9427dfa8-2deb-490a-825e-dc26974102fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="render\headers\render_passes">
-      <UniqueIdentifier>{0d9f4614-009b-4d09-8341-bf583b41101f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="render\render_passes">
       <UniqueIdentifier>{c48772ce-36ac-48c3-9d5e-40b6cf174bfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor">
+      <UniqueIdentifier>{0ef6dedc-159f-455c-8138-33f5fd6cdd75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\headers">
+      <UniqueIdentifier>{794306d8-cea8-445d-905e-85cbeed06eaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render\render_passes\headers">
+      <UniqueIdentifier>{0d9f4614-009b-4d09-8341-bf583b41101f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{e40bb4de-5e8e-462a-a078-a7215fa72a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\headers">
+      <UniqueIdentifier>{9427dfa8-2deb-490a-825e-dc26974102fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lua">
+      <UniqueIdentifier>{98fc55dd-423d-4ffb-a3dd-8eab2802538e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -53,9 +62,6 @@
     <ClCompile Include="errors.cpp">
       <Filter>render</Filter>
     </ClCompile>
-    <ClCompile Include="editor_ui.cpp">
-      <Filter>render</Filter>
-    </ClCompile>
     <ClCompile Include="render_target.cpp">
       <Filter>render</Filter>
     </ClCompile>
@@ -75,7 +81,7 @@
       <Filter>render</Filter>
     </ClCompile>
     <ClCompile Include="game.cpp">
-      <Filter>game</Filter>
+      <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="pass_geometry.cpp">
       <Filter>render\render_passes</Filter>
@@ -98,6 +104,15 @@
     <ClCompile Include="pass_shadow_map.cpp">
       <Filter>render\render_passes</Filter>
     </ClCompile>
+    <ClCompile Include="editor_ui.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imGuIZMO.quat\imGuIZMOquat.cpp">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="node.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -116,9 +131,6 @@
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="errors.h">
-      <Filter>render\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="editor_ui.h">
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="helpers.h">
@@ -143,31 +155,37 @@
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
-      <Filter>game\headers</Filter>
+      <Filter>core\headers</Filter>
     </ClInclude>
     <ClInclude Include="pipeline.h">
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="pass_ssao.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
     <ClInclude Include="pass_geometry.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
     <ClInclude Include="pass_light.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
     <ClInclude Include="default_pipeline.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
     <ClInclude Include="effect_pass.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
     <ClInclude Include="pass_post_processing.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
     <ClInclude Include="pass_shadow_map.h">
-      <Filter>render\headers\render_passes</Filter>
+      <Filter>render\render_passes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_ui.h">
+      <Filter>editor\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node.h">
+      <Filter>core\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

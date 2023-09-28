@@ -3,7 +3,7 @@
 
 using namespace scrinks::render;
 
-static glm::vec3 s_up{ 0.0, -1.0, 0.0 };
+static glm::vec3 s_up{ 0.0, 1.0, 0.0 };
 
 void Camera::update_view()
 {
@@ -45,7 +45,7 @@ void FPSCamera::calc_forward()
 
 void FPSCamera::process_mouse(float dX, float dY, float dT)
 {
-	m_yaw   += dX * m_sensitivity * dT;
+	m_yaw   -= dX * m_sensitivity * dT;
 	m_pitch += dY * m_sensitivity * dT;
 
 	m_pitch = glm::clamp(m_pitch, -m_minMaxPitch, m_minMaxPitch);
@@ -73,4 +73,9 @@ void scrinks::render::FPSCamera::move_relative_to_target(float amount, Direction
 		break;
 	}
 	flag_changed();
+}
+
+IsoCamera::IsoCamera(float scale)
+	:m_scale{ scale }
+{
 }

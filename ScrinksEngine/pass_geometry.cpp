@@ -1,6 +1,10 @@
 #include "pass_geometry.h"
 #include "model.h"
-#include <glm/ext/matrix_float4x4.hpp>
+
+#pragma warning(push)
+#pragma warning(disable: 4201)
+#include <glm/ext.hpp>
+#pragma warning(pop)
 
 using namespace scrinks::render::pass;
 
@@ -11,15 +15,15 @@ Geometry::~Geometry()
 
 void Geometry::init()
 {
-    RenderPass::init();
-
     m_shader = render::ShaderManager::instance().load_and_store
     (
         "deferred_render",
         { "assets/shaders/render_single.vs", "assets/shaders/render_single.fs" }
     );
 
+    render::ModelManager::instance().load_and_store("cube", "D:/Assets/voxel/10_cube_basic.obj");
     render::ModelManager::instance().load_and_store("monu2", "D:/Assets/custom/monu2.obj");
+    render::ModelManager::instance().load_and_store("torus", "assets/models/torus.obj");
 }
 
 void Geometry::draw()
@@ -40,14 +44,26 @@ void Geometry::draw()
         m_shader->use_program();
     }
 
-    // temp hardcoded model
-    glm::mat4 model{ glm::mat4(1.0f) };
-    m_shader->set_param("model", model);
     m_shader->set_param("view", Pipeline::camera().view());
     m_shader->set_param("projection", Pipeline::projection());
+    const auto room{ render::ModelManager::instance().get("torus") };
+    const auto cube{ render::ModelManager::instance().get("cube") };
 
-    const auto room{ render::ModelManager::instance().get("monu2") };
-    room->draw(m_shader);
+    glm::mat4 model{ glm::mat4(1.0f) };
+
+    for (int z = -1; z < 1; z++)
+    {
+        for (int x = -1; x < 1; x++)
+        {
+            glm::vec3 pos{ x * 3, 1.0f, z * 3 };
+            m_shader->set_param("model", glm::translate(model, pos));
+            room->draw(m_shader);
+        }
+    }
+
+    //glm::vec3 pos{ 0.0f, 0.0f, 0.0f };
+    //m_shader->set_param("model", glm::translate(model, pos));
+    //room->draw(m_shader);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

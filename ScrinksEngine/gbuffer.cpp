@@ -106,7 +106,7 @@ GBuffer::GBuffer(GLsizei width, GLsizei height)
 	add_buffer("position",  BufferFormat::rgb16f);
 	add_buffer("normal",    BufferFormat::rgb16f);
 	add_buffer("albedo",    BufferFormat::rgba);
-	add_buffer("depth",     BufferFormat::depth, GL_DEPTH_ATTACHMENT);
+	add_buffer("depth", BufferFormat::depth, GL_DEPTH_ATTACHMENT);
 
 	glGenFramebuffers(1, &m_id);
 }

@@ -15,6 +15,6 @@ uniform float testA;
 void main()
 {
     gAlbedo = texture(tex1, texCoord);
-    gPosition = fragPos.xyz;
+    gPosition = fragPos;
     gNormal = normalize(normal);
 }

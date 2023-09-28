@@ -2,7 +2,6 @@
 
 #include "debug.h"
 
-#define GLM_FORCE_SILENT_WARNINGS
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -205,7 +204,7 @@ void Shader::set_param(const std::string& name, glm::mat4 value) const
 
 void Shader::set_test_param(const std::string& name) const
 {
-	set_param(name, *scrinks::debug::get_test_float(name));
+	set_param(name, scrinks::debug::get_test_float(name));
 }
 
 

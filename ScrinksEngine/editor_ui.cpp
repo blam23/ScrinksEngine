@@ -9,6 +9,13 @@
 #include "pipeline.h"
 #include "glm/glm.hpp"
 
+#pragma warning(push)
+#pragma warning( disable : 4244 )
+#pragma warning( disable : 4100 )
+#pragma warning( disable : 4305 )
+#include "imGuIZMO.quat/imGuIZMOquat.h"
+#pragma warning(pop)
+
 using namespace scrinks;
 
 bool requestVsync{ true };
@@ -16,6 +23,7 @@ ImColor info_regular{ ImColor{ 230, 230, 230 } };
 ImColor info_highlight{ ImColor{ 120, 230, 230 } };
 int dbgTextureID{ 0 };
 bool unFocusGame{ true };
+render::pass::ShadowMap* shadowMap{ nullptr };
 
 editor::AssetNameCache<render::TextureManager> textureNameCache{};
 editor::AssetNameCache<render::BufferManager>  bufferNameCache{};
@@ -40,6 +48,11 @@ void refresh_caches_as_needed(ImGuiIO& io, float interval = 100)
     }
 
     refreshIndex++;
+}
+
+void scrinks::editor::add_shadow_map_tracker(render::pass::ShadowMap* m)
+{
+    shadowMap = m;
 }
 
 void render_viewport()
@@ -69,7 +82,7 @@ void render_viewport()
 
             Window::set_input_active(focused);
 
-            ImGui::Image((void*)(intptr_t)viewport->id(), ImVec2{ viewportPanelSize.x, viewportPanelSize.y });
+            ImGui::Image((void*)(intptr_t)viewport->id(), ImVec2{ viewportPanelSize.x, viewportPanelSize.y }, { 0, 1 }, { 1, 0 });
 
             if (focused)
             {
@@ -103,11 +116,6 @@ void show_camera_info()
 void editor::init()
 {
     gui::set_style_large_mat_blue();
-
-    debug::register_test_float("testA", 0.0f);
-    debug::register_test_float("testB", 0.0f);
-    debug::register_test_float("testC", 0.0f);
-    debug::register_test_float("testD", 0.0f);
 }
 
 void editor::render_ui()
@@ -143,6 +151,12 @@ void editor::render_ui()
             render::Pipeline::force_recreate();
         }
 
+        if (shadowMap)
+        {
+            if (ImGui::MenuItem("Recalc Shadows"))
+                shadowMap->tag_outdated();
+        }
+
         ImGui::SameLine(ImGui::GetWindowWidth() - 235);
         ImGui::TextColored(vsyncEnabled ? info_regular : info_highlight, "%.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::EndMainMenuBar();
@@ -155,6 +169,11 @@ void editor::render_ui()
         for (auto& [name, value] : debug::get_all_test_floats())
         {
             ImGui::DragFloat(name.c_str(), &value);
+            ImGui::Spacing();
+        }
+        for (auto& [name, value] : debug::get_all_test_dirs())
+        {
+            ImGui::gizmo3D(name.c_str(), value);
             ImGui::Spacing();
         }
     }
@@ -199,7 +218,7 @@ void editor::render_ui()
         if (displayTexture)
         {
             ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            ImGui::Image((void*)(intptr_t)displayTexture->id(), ImVec2{ glm::min((float)displayTexture->width(), viewportPanelSize.x), glm::min((float)displayTexture->height(), viewportPanelSize.x) });
+            ImGui::Image((void*)(intptr_t)displayTexture->id(), ImVec2{ glm::min((float)displayTexture->width(), viewportPanelSize.x), glm::min((float)displayTexture->height(), viewportPanelSize.x) }, { 0, 1 }, { 1, 0 });
         }
     }
     ImGui::End();
@@ -233,7 +252,7 @@ void editor::render_ui()
         if (displayBuffer)
         {
             ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            ImGui::Image((void*)(intptr_t)displayBuffer->id(), ImVec2{ glm::min((float)displayBuffer->width(), viewportPanelSize.x), glm::min((float)displayBuffer->height(), viewportPanelSize.x )});
+            ImGui::Image((void*)(intptr_t)displayBuffer->id(), ImVec2{ glm::min((float)displayBuffer->width(), viewportPanelSize.x), glm::min((float)displayBuffer->height(), viewportPanelSize.x )}, { 0, 1 }, { 1, 0 });
         }
     }
     ImGui::End();
@@ -265,4 +284,5 @@ void editor::render_ui()
     ImGui::EndFrame();
     ImGui::UpdatePlatformWindows();
 }
+
 

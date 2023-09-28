@@ -72,9 +72,9 @@ void main()
 {
     vec2  size   = textureSize(lit, 0);
     float depth  = texture(depth, texCoord).r;
-    vec3  sample = fxaa(size);
+    vec3  sample = fxaa(size); // texture2D(lit,texCoord).xyz; //
 
-    sample = tone_map(sample, 1.0, 1.0);
+    sample = tone_map(sample, 1.5, 3);
 
     colour = sample;
 }

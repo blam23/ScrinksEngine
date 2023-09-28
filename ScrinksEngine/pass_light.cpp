@@ -1,4 +1,5 @@
 #include "pass_light.h"
+#include "pass_shadow_map.h"
 
 using namespace scrinks::render::pass;
 
@@ -31,31 +32,25 @@ void DeferredLighting::setup_draw()
     m_shader->set_param("gPosition", 0);
     m_shader->set_param("gNormal", 1);
     m_shader->set_param("gAlbedoSpec", 2);
-    m_shader->set_param("depth", 3);
+    m_shader->set_param("gDepth", 3);
     m_shader->set_param("ssao", 4);
+    m_shader->set_param("shadowMap", 5);
 
     Buffer::bind(GL_TEXTURE0, "position");
     Buffer::bind(GL_TEXTURE1, "normal");
     Buffer::bind(GL_TEXTURE2, "albedo");
     Buffer::bind(GL_TEXTURE3, "depth");
     Buffer::bind(GL_TEXTURE4, "ssao");
-
-    //// send light relevant uniforms
-    //for (unsigned int i = 0; i < lightPositions.size(); i++)
-    //{
-    //    m_shader->set_param("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
-    //    m_shader->set_param("lights[" + std::to_string(i) + "].Color", lightColors[i]);
-    //    // update attenuation parameters and calculate radius
-    //    const float linear = 0.7f;
-    //    const float quadratic = 1.8f;
-    //    m_shader->set_param("lights[" + std::to_string(i) + "].Linear", linear);
-    //    m_shader->set_param("lights[" + std::to_string(i) + "].Quadratic", quadratic);
-    //}
+    Buffer::bind(GL_TEXTURE5, "shadow_map");
 
     m_shader->set_param("ambientLightDir", glm::vec3(-2.0, 11.0, 7.0f));
     m_shader->set_param("ambientLightColour", glm::vec3(1.0f, 1.0f, 1.0f));
     m_shader->set_param("ambientLightIntensity", 0.2f);
-    m_shader->set_param("view", Pipeline::camera().view());
+    m_shader->set_param("inverseView", glm::inverse(Pipeline::camera().view()));
+
+    if (m_map)
+        m_shader->set_param("lightSpaceMatrix", m_map->get_light_space());
+
     m_shader->set_test_param("testA");
     m_shader->set_test_param("testB");
     m_shader->set_test_param("testC");

@@ -19,7 +19,7 @@ uniform mat4 view;
 uniform int screenWidth;
 uniform int screenHeight;
 
-const float bias = 0.005;
+const float bias = 0.015;
 const float radius = 0.2;
 
 void main()
@@ -57,6 +57,5 @@ void main()
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
     }
     occlusion = 1-(occlusion / kernelSize);
-    
     colour = occlusion;
 }

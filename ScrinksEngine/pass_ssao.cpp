@@ -23,10 +23,7 @@ SSAO::~SSAO()
 void SSAO::configure_kernel_count(size_t kernels)
 {
 	m_kernels_requested = kernels;
-
-	// Re-initialise if required
-	if (m_initialised)
-		init();
+	init();
 }
 
 float lerp(float a, float b, float t)
@@ -55,18 +52,13 @@ void SSAO::load_assets()
 		m_kernel.push_back(sample);
 	}
 
-	if (!m_initialised)
-	{
-		generate_noise_texture();
+	generate_noise_texture();
 
-		m_shader = render::ShaderManager::instance().load_and_store(
-			"ssao", { "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao.fs" }
-		);
+	m_shader = render::ShaderManager::instance().load_and_store(
+		"ssao", { "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao.fs" }
+	);
 
-		send_data_to_shader();
-	}
-
-	RenderPass::init();
+	send_data_to_shader();
 }
 
 void SSAO::send_data_to_shader()
@@ -92,12 +84,12 @@ void SSAO::setup_draw()
 	m_shader->set_param("gPosition", 0);
 	m_shader->set_param("gNormal", 1);
 	m_shader->set_param("texNoise", 2);
-	m_shader->set_param("radius", *debug::get_test_float("radius"));
-	m_shader->set_param("bias",   *debug::get_test_float("bias"));
-	m_shader->set_param("testA",  *debug::get_test_float("testA"));
-	m_shader->set_param("testB",  *debug::get_test_float("testB"));
-	m_shader->set_param("testC",  *debug::get_test_float("testC"));
-	m_shader->set_param("testD",  *debug::get_test_float("testD"));
+	m_shader->set_param("radius", debug::get_test_float("radius"));
+	m_shader->set_param("bias",   debug::get_test_float("bias"));
+	m_shader->set_param("testA",  debug::get_test_float("testA"));
+	m_shader->set_param("testB",  debug::get_test_float("testB"));
+	m_shader->set_param("testC",  debug::get_test_float("testC"));
+	m_shader->set_param("testD",  debug::get_test_float("testD"));
 	send_data_to_shader();
 
 	Buffer::bind(GL_TEXTURE0, "position");

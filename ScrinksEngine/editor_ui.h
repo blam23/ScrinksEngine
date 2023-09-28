@@ -8,6 +8,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
+#include "pass_shadow_map.h"
 
 namespace scrinks::editor
 {
@@ -30,4 +31,6 @@ namespace scrinks::editor
 
 	void init();
 	void render_ui();
+
+    void add_shadow_map_tracker(render::pass::ShadowMap* map);
 }

@@ -18,7 +18,7 @@ namespace scrinks::render::pass
 	{
 	public:
 		virtual ~EffectPass() {};
-		void init() override;
+		void init();
 		void draw() override;
 
 	protected:
