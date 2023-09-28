@@ -150,6 +150,8 @@
     <ClCompile Include="gbuffer.cpp" />
     <ClCompile Include="gl3w.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pass_post_processing.cpp" />
+    <ClCompile Include="pass_shadow_map.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="pass_light.cpp" />
@@ -170,6 +172,8 @@
     <ClInclude Include="errors.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gbuffer.h" />
+    <ClInclude Include="pass_post_processing.h" />
+    <ClInclude Include="pass_shadow_map.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="imgui_style.h" />

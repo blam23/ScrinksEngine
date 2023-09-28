@@ -4,11 +4,11 @@
 
 namespace scrinks::render::pass
 {
-	class DeferredLighting : public EffectPass
+	class PostProcessing : public EffectPass
 	{
 	public:
-		DeferredLighting();
-		~DeferredLighting() override;
+		PostProcessing();
+		~PostProcessing() override;
 
 	public:
 		void load_assets() override;

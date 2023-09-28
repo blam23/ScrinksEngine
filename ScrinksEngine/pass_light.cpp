@@ -3,7 +3,7 @@
 using namespace scrinks::render::pass;
 
 DeferredLighting::DeferredLighting()
-    : EffectPass{ "viewport", render::BufferFormat::rgb }
+    : EffectPass{ "lit", render::BufferFormat::rgb16f }
 {
 }
 
@@ -31,12 +31,14 @@ void DeferredLighting::setup_draw()
     m_shader->set_param("gPosition", 0);
     m_shader->set_param("gNormal", 1);
     m_shader->set_param("gAlbedoSpec", 2);
-    m_shader->set_param("ssao", 3);
+    m_shader->set_param("depth", 3);
+    m_shader->set_param("ssao", 4);
 
     Buffer::bind(GL_TEXTURE0, "position");
     Buffer::bind(GL_TEXTURE1, "normal");
     Buffer::bind(GL_TEXTURE2, "albedo");
-    Buffer::bind(GL_TEXTURE3, "ssao");
+    Buffer::bind(GL_TEXTURE3, "depth");
+    Buffer::bind(GL_TEXTURE4, "ssao");
 
     //// send light relevant uniforms
     //for (unsigned int i = 0; i < lightPositions.size(); i++)

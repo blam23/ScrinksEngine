@@ -92,6 +92,12 @@
     <ClCompile Include="effect_pass.cpp">
       <Filter>render\render_passes</Filter>
     </ClCompile>
+    <ClCompile Include="pass_post_processing.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
+    <ClCompile Include="pass_shadow_map.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -155,6 +161,12 @@
       <Filter>render\headers\render_passes</Filter>
     </ClInclude>
     <ClInclude Include="effect_pass.h">
+      <Filter>render\headers\render_passes</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_post_processing.h">
+      <Filter>render\headers\render_passes</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_shadow_map.h">
       <Filter>render\headers\render_passes</Filter>
     </ClInclude>
   </ItemGroup>
