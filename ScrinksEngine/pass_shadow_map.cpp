@@ -5,6 +5,9 @@
 
 using namespace scrinks::render::pass;
 
+#include "drawable.h"
+#include "node_model.h"
+
 ShadowMap::ShadowMap()
 {
 }
@@ -60,14 +63,14 @@ void ShadowMap::tag_outdated()
     m_outdated = true;
 }
 
-#include "editor_ui.h"
+#include "editor_debug.h"
 ShadowMap* ShadowMap::send_to_debug_ui()
 {
     editor::add_shadow_map_tracker(this);
     return this;
 }
 
-void ShadowMap::draw()
+void ShadowMap::draw(float interpolate)
 {
     //if (!m_outdated)
     //    return;
@@ -83,18 +86,7 @@ void ShadowMap::draw()
         m_shader->use_program();
         m_shader->set_param("lightProjection", get_light_space());
 
-        const auto room{ render::ModelManager::instance().get("torus") };
-        glm::mat4 model{ glm::mat4(1.0f) };
-
-        for (int z = -1; z < 1; z++)
-        {
-            for (int x = -1; x < 1; x++)
-            {
-                glm::vec3 pos{ x * 3, 1.0f, z * 3 };
-                m_shader->set_param("model", glm::translate(model, pos));
-                room->draw(m_shader);
-            }
-        }
+        core::nodes::DynamicModel::draw_list(m_shader, interpolate);
 
         Pipeline::fullscreen_quad();
     }

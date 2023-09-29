@@ -13,7 +13,7 @@ void EffectPass::init()
     load_assets();
 }
 
-void EffectPass::draw()
+void EffectPass::draw(float)
 {
     glDisable(GL_DEPTH_TEST);
 

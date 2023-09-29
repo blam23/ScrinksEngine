@@ -19,13 +19,16 @@ namespace scrinks
 	class Window
 	{
 	public:
+		using FixedUpdateCallback = std::function<void()>;
+
 		static bool init(int width, int height, const std::string& name);
 		static void shutdown();
 		static void run_loop();
 		static void set_vsync(bool enabled);
 		static bool is_vsync_enabled();
-
-		static void set_input_active(bool active);
+		static void set_capture_cursor(bool capture);
+		static void register_for_fixed_updates(FixedUpdateCallback func);
+		static double fixed_updates_per_second();
 
 	public:
 		static int s_windowWidth;
@@ -33,6 +36,8 @@ namespace scrinks
 
 	private:
 		static void handle_input();
+		static float check_fixed_update_timer();
+		static void fixed_update();
 		static bool setup_imgui();
 		static bool setup_glfw(int width, int height, const std::string& name);
 
@@ -40,5 +45,7 @@ namespace scrinks
 		static bool s_vsync;
 		static bool s_inputActive;
 		static GLenum s_log_level;
+
+		static std::vector<FixedUpdateCallback> s_fixedUpdateCallbacks;
 	};
 }

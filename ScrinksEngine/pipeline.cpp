@@ -14,7 +14,7 @@ GLsizei s_newWidth{ 0 };
 GLsizei s_newHeight{ 0 };
 bool s_resized{ false };
 
-void Pipeline::draw()
+void Pipeline::draw(float interpolate)
 {
     if (s_resized)
         handle_resize();
@@ -25,7 +25,7 @@ void Pipeline::draw()
     s_projection = glm::perspective(glm::radians(s_camera.fov()), (float)s_viewWidth / (float)s_viewHeight, 0.1f, 100.0f);
 
     for (auto& pass : s_passes)
-        pass->draw();
+        pass->draw(interpolate);
 }
 
 void Pipeline::setup(GLsizei width, GLsizei height)

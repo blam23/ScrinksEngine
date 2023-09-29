@@ -3,6 +3,7 @@
 #include "helpers.h"
 #include "gbuffer.h"
 #include "camera.h"
+#include "shader.h"
 #include <memory>
 
 namespace scrinks::render
@@ -15,7 +16,7 @@ namespace scrinks::render
 		Pipeline() = delete;
 
 	public:
-		static void draw();
+		static void draw(float interpolation);
 		static void resize(GLsizei width, GLsizei height);
 		static void resize_if_needed(GLsizei width, GLsizei height);
 		static void force_recreate();
@@ -50,7 +51,7 @@ namespace scrinks::render
 		virtual ~RenderPass() {}
 
 	public:
-		virtual void draw() = 0;
+		virtual void draw(float interpolate) = 0;
 
 	protected:
 		RenderPass() = default;

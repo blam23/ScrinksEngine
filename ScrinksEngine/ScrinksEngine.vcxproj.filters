@@ -39,6 +39,18 @@
     <Filter Include="core\lua">
       <UniqueIdentifier>{98fc55dd-423d-4ffb-a3dd-8eab2802538e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\nodes">
+      <UniqueIdentifier>{81dcdb16-ef48-4116-aeff-7bffe1d314d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\nodes\headers">
+      <UniqueIdentifier>{f98378d6-7853-4803-8cb0-68f3bce0830d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\lua\headers">
+      <UniqueIdentifier>{f45f7d98-dd86-474c-af35-4c265d97c19c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="editor\inspectors">
+      <UniqueIdentifier>{9fa19557-06d3-46f9-b99f-de68cdc95dde}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,9 +75,6 @@
       <Filter>render</Filter>
     </ClCompile>
     <ClCompile Include="render_target.cpp">
-      <Filter>render</Filter>
-    </ClCompile>
-    <ClCompile Include="asset.cpp">
       <Filter>render</Filter>
     </ClCompile>
     <ClCompile Include="texture.cpp">
@@ -104,7 +113,7 @@
     <ClCompile Include="pass_shadow_map.cpp">
       <Filter>render\render_passes</Filter>
     </ClCompile>
-    <ClCompile Include="editor_ui.cpp">
+    <ClCompile Include="editor_debug.cpp">
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="include\imGuIZMO.quat\imGuIZMOquat.cpp">
@@ -113,12 +122,39 @@
     <ClCompile Include="node.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="editor_main.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="metadata_helpers.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_scene_tree.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_engine.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="asset.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="script.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_init_nodes.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="node_3d.cpp">
+      <Filter>core\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="node_model.cpp">
+      <Filter>core\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
-      <Filter>render\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui_style.h">
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="gbuffer.h">
@@ -140,9 +176,6 @@
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="texture.h">
-      <Filter>render\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="asset.h">
       <Filter>render\headers</Filter>
     </ClInclude>
     <ClInclude Include="mesh.h">
@@ -181,11 +214,50 @@
     <ClInclude Include="pass_shadow_map.h">
       <Filter>render\render_passes\headers</Filter>
     </ClInclude>
-    <ClInclude Include="editor_ui.h">
+    <ClInclude Include="editor_debug.h">
       <Filter>editor\headers</Filter>
     </ClInclude>
     <ClInclude Include="node.h">
       <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_scene_tree.h">
+      <Filter>editor\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_main.h">
+      <Filter>editor\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_style.h">
+      <Filter>editor\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="metadata_helpers.h">
+      <Filter>editor\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="lua_engine.h">
+      <Filter>core\lua\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_3d.h">
+      <Filter>core\nodes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="asset.h">
+      <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="script.h">
+      <Filter>core\lua\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="lua_init_nodes.h">
+      <Filter>core\lua\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_model.h">
+      <Filter>core\nodes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="drawable.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="inspector_node3d.h">
+      <Filter>editor\inspectors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

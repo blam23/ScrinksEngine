@@ -21,9 +21,9 @@ namespace scrinks::render
 		std::string fragmentPath;
 	};
 
-	using ShaderManager = AssetManager<ShaderDescription, Shader>;
+	using ShaderManager = core::AssetManager<ShaderDescription, Shader>;
 
-	class Shader : public Asset
+	class Shader : public core::Asset
 	{
 	public:
 		Shader(Badge<ShaderManager>, const std::string& vertexShader, const std::string& fragmentShader);

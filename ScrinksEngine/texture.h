@@ -10,9 +10,9 @@ namespace scrinks::render
 {
 	class Texture;
 	using TextureDescription = std::string;
-	using TextureManager = AssetManager<TextureDescription, Texture>;
+	using TextureManager = core::AssetManager<TextureDescription, Texture>;
 
-	class Texture : public Asset
+	class Texture : public core::Asset
 	{
 	public:
 		Texture(Badge<TextureManager>, uint32_t id, GLuint width, GLuint height, GLuint channels);

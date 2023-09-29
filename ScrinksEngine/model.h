@@ -10,9 +10,9 @@ namespace scrinks::render
 {
 	class Model;
 	using ModelDescription = std::string;
-	using ModelManager = AssetManager<ModelDescription, Model>;
+	using ModelManager = core::AssetManager<ModelDescription, Model>;
 
-	class Model : public Asset
+	class Model : public core::Asset
 	{
 	public:
 		Model(Badge<ModelManager>, std::vector<Mesh>&& meshes);

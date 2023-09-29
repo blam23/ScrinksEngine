@@ -1,6 +1,5 @@
-#include "editor_ui.h"
+#include "editor_debug.h"
 #include "debug.h"
-#include "imgui_style.h"
 #include "window.h"
 #include "shader.h"
 #include "texture.h"
@@ -18,12 +17,7 @@
 
 using namespace scrinks;
 
-bool requestVsync{ true };
-ImColor info_regular{ ImColor{ 230, 230, 230 } };
-ImColor info_highlight{ ImColor{ 120, 230, 230 } };
 int dbgTextureID{ 0 };
-bool unFocusGame{ true };
-render::pass::ShadowMap* shadowMap{ nullptr };
 
 editor::AssetNameCache<render::TextureManager> textureNameCache{};
 editor::AssetNameCache<render::BufferManager>  bufferNameCache{};
@@ -31,8 +25,10 @@ editor::AssetNameCache<render::ShaderManager>  shaderNameCache{};
 
 float timeSinceRefresh = 0.0f;
 int refreshIndex = 0;
-void refresh_caches_as_needed(ImGuiIO& io, float interval = 100)
+void refresh_caches_as_needed(float interval = 100)
 {
+    ImGuiIO& io{ ImGui::GetIO() };
+
     timeSinceRefresh += io.DeltaTime;
     if (timeSinceRefresh < interval / 1000.0f)
         return;
@@ -50,54 +46,8 @@ void refresh_caches_as_needed(ImGuiIO& io, float interval = 100)
     refreshIndex++;
 }
 
-void scrinks::editor::add_shadow_map_tracker(render::pass::ShadowMap* m)
-{
-    shadowMap = m;
-}
-
-void render_viewport()
-{
-    std::shared_ptr<render::Buffer> viewport{ render::BufferManager::instance().get("viewport") };
-        
-    ImGuiID id = ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_PassthruCentralNode, nullptr);
-    ImGuiDockNode* node = ImGui::DockBuilderGetCentralNode(id);
-
-    ImGuiWindowClass centralAlways = {};
-    centralAlways.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoDockingOverMe;
-    ImGui::SetNextWindowClass(&centralAlways);
-    ImGui::SetNextWindowDockID(node->ID, ImGuiCond_Always);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
-
-    ImGui::Begin("Viewport", nullptr);
-    {
-        ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-        render::Pipeline::resize_if_needed((int)viewportPanelSize.x, (int)viewportPanelSize.y);
-
-        if (viewport && viewport->id() > 0)
-        {
-            const bool focused{ ImGui::IsWindowFocused() };
-
-            if (focused && unFocusGame)
-                ImGui::SetWindowFocus("Debug");
-
-            Window::set_input_active(focused);
-
-            ImGui::Image((void*)(intptr_t)viewport->id(), ImVec2{ viewportPanelSize.x, viewportPanelSize.y }, { 0, 1 }, { 1, 0 });
-
-            if (focused)
-            {
-                ImVec2 bl{ node->Pos.x + viewportPanelSize.x, node->Pos.y + viewportPanelSize.y };
-                ImGui::GetForegroundDrawList()->AddRect(node->Pos, bl, IM_COL32(255, 0, 0, 200), 0, 0, 2.0f);
-            }
-        }
-    }
-
-    ImGui::PopStyleVar();
-    ImGui::End();
-}
-
 float fov{ 90.0f };
-void show_camera_info()
+void camera_info()
 {
     ImGui::Begin("Camera");
     {
@@ -112,60 +62,18 @@ void show_camera_info()
     ImGui::End();
 }
 
-
-void editor::init()
-{
-    gui::set_style_large_mat_blue();
-}
-
-void editor::render_ui()
+bool requestVsync{ true };
+void debug()
 {
     bool vsyncEnabled = Window::is_vsync_enabled();
-    auto& io = ImGui::GetIO();
-
-    unFocusGame = ImGui::IsKeyDown(ImGuiKey::ImGuiKey_Escape);
-
-    refresh_caches_as_needed(io);
-
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    render_viewport();
-
-    ImGui::BeginMainMenuBar();
-    {
-        if (ImGui::MenuItem("Reload All"))
-        {
-            render::ShaderManager::instance().reload_all();
-            render::ModelManager::instance().reload_all();
-            render::TextureManager::instance().reload_all();
-
-            render::Pipeline::force_recreate();
-        }
-
-        if (ImGui::MenuItem("Reload Shaders"))
-        {
-            render::ShaderManager::instance().reload_all();
-
-            render::Pipeline::force_recreate();
-        }
-
-        if (shadowMap)
-        {
-            if (ImGui::MenuItem("Recalc Shadows"))
-                shadowMap->tag_outdated();
-        }
-
-        ImGui::SameLine(ImGui::GetWindowWidth() - 235);
-        ImGui::TextColored(vsyncEnabled ? info_regular : info_highlight, "%.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::EndMainMenuBar();
-    }
-
-    show_camera_info();
-
     ImGui::Begin("Debug");
     {
+        ImGui::Checkbox("Vsync", &requestVsync);
+        if (requestVsync != vsyncEnabled)
+        {
+            Window::set_vsync(requestVsync);
+        }
+
         for (auto& [name, value] : debug::get_all_test_floats())
         {
             ImGui::DragFloat(name.c_str(), &value);
@@ -178,24 +86,23 @@ void editor::render_ui()
         }
     }
     ImGui::End();
+}
 
-    ImGui::Begin("Sidebar");
-    {
-        ImGui::Checkbox("Vsync", &requestVsync);
-        if (requestVsync != vsyncEnabled)
-        {
-            Window::set_vsync(requestVsync);
-        }
-    }
-    ImGui::End();
+render::pass::ShadowMap* shadowMap{ nullptr };
+void editor::add_shadow_map_tracker(render::pass::ShadowMap* m)
+{
+    shadowMap = m;
+}
 
-    if(ImGui::Begin("Textures"))
+void assets()
+{
+    if (ImGui::Begin("Textures"))
     {
         static int chosen{ 1 };
         ImGui::PushItemWidth(-1);
         int count{ (int)textureNameCache.size() };
         static std::shared_ptr<render::Texture> displayTexture{ nullptr };
-        if(count > 0)
+        if (count > 0)
         {
             chosen %= count;
             if (ImGui::BeginCombo("##", textureNameCache[chosen].data()))
@@ -252,7 +159,7 @@ void editor::render_ui()
         if (displayBuffer)
         {
             ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            ImGui::Image((void*)(intptr_t)displayBuffer->id(), ImVec2{ glm::min((float)displayBuffer->width(), viewportPanelSize.x), glm::min((float)displayBuffer->height(), viewportPanelSize.x )}, { 0, 1 }, { 1, 0 });
+            ImGui::Image((void*)(intptr_t)displayBuffer->id(), ImVec2{ glm::min((float)displayBuffer->width(), viewportPanelSize.x), glm::min((float)displayBuffer->height(), viewportPanelSize.x) }, { 0, 1 }, { 1, 0 });
         }
     }
     ImGui::End();
@@ -261,7 +168,7 @@ void editor::render_ui()
     {
         bool ignoreSelect;
         ImGui::PushItemWidth(-1);
-        if(ImGui::BeginListBox("##hidelabel"))
+        if (ImGui::BeginListBox("##hidelabel"))
         {
             for (const auto& name : shaderNameCache)
             {
@@ -272,17 +179,13 @@ void editor::render_ui()
         ImGui::PopItemWidth();
     }
     ImGui::End();
-
-    ImGui::Render();
-
-    glViewport(0, 0, Window::s_windowWidth, Window::s_windowHeight);
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    ImGui::EndFrame();
-    ImGui::UpdatePlatformWindows();
 }
 
+void editor::render_debug()
+{
+    refresh_caches_as_needed();
+    camera_info();
+    ::debug();
+    assets();
+}
 

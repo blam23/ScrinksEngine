@@ -29,8 +29,8 @@ namespace scrinks::editor
         }
     };
 
-	void init();
-	void render_ui();
+    void render_debug();
 
     void add_shadow_map_tracker(render::pass::ShadowMap* map);
 }
+

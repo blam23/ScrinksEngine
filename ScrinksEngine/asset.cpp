@@ -2,9 +2,9 @@
 
 #include <map>
 
-using namespace scrinks::render;
+using namespace scrinks::core;
 
-scrinks::render::Asset::Asset(std::uint32_t id)
+Asset::Asset(std::uint32_t id)
 	: m_id{ id }
 {
 }

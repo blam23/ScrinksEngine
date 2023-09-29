@@ -1,11 +1,13 @@
 #include "window.h"
 
-#include "editor_ui.h"
+#include "editor_main.h"
+#include "game.h"
 #include "debug.h"
 #include "errors.h"
 #include "default_pipeline.h"
 
 #include <iostream>
+#include <array>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -19,11 +21,24 @@ int Window::s_windowWidth { 0 };
 int Window::s_windowHeight{ 0 };
 GLFWwindow* Window::s_window{ nullptr };
 
+std::vector<Window::FixedUpdateCallback> Window::s_fixedUpdateCallbacks{};
+
 static void window_size_callback(GLFWwindow*, int width, int height)
 {
     Window::s_windowWidth = width;
     Window::s_windowHeight = height;
 }
+
+void Window::set_capture_cursor(bool capture)
+{
+    glfwSetInputMode(s_window, GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+}
+
+void scrinks::Window::register_for_fixed_updates(FixedUpdateCallback func)
+{
+    s_fixedUpdateCallbacks.push_back(func);
+}
+
 
 bool Window::setup_imgui()
 {
@@ -33,7 +48,7 @@ bool Window::setup_imgui()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.Fonts->AddFontFromFileTTF("assets/fonts/fira.otf", 16);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/open-sans-semi.ttf", 20);
     ImGui_ImplGlfw_InitForOpenGL(s_window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
 
@@ -102,65 +117,61 @@ bool Window::init(int width, int height, const std::string& name)
         exit(2);
     }
 
+    editor::init();
+
     setup_pipeline();
+
+    core::Game::init(std::make_unique<core::Node>(nullptr));
 
     return true;
 }
 
-
-bool oldActive{ false };
-bool justActivated{ true };
-void scrinks::Window::set_input_active(bool active)
+void scrinks::Window::fixed_update()
 {
-    if (!oldActive)
+    for (auto itr = s_fixedUpdateCallbacks.begin(); itr != s_fixedUpdateCallbacks.end(); itr++)
     {
-        justActivated = true;
-        oldActive = true;
+        if (*itr)
+            (*itr)();
+        else
+            s_fixedUpdateCallbacks.erase(itr);
     }
 
-    s_inputActive = active;
-    glfwSetInputMode(s_window, GLFW_CURSOR, active ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    core::Game::fixed_update();
 }
 
-glm::vec2 oldMousePos{ 0.0f, 0.0f };
-float mouseMaxMove{ 100.0f };
-void Window::handle_input()
+std::array<double,20> avg{ 0.0 };
+int slide = 0;
+double fixedUpdatePrev{ 0 };
+double fixedUpdateDelta{ 0 };
+int nextFixedUpdate{ 0 };
+float scrinks::Window::check_fixed_update_timer()
 {
-    ImGuiIO& io = ImGui::GetIO();
-
-    render::FPSCamera& camera{ render::Pipeline::camera() };
-
-    glm::vec2 newMousePos = glm::vec2{ io.MousePos.x, io.MousePos.y };
-    glm::vec2 mouseDelta = oldMousePos - newMousePos;
-    float deltaLen = glm::length(mouseDelta);
-    oldMousePos = newMousePos;
-
-    if (justActivated)
-        justActivated = false;
-    else
+    std::uint16_t loops{ 0 };
+    while ((glfwGetTime() * 1000) > nextFixedUpdate && loops < core::Game::MaxFrameSkip)
     {
-        if (deltaLen > mouseMaxMove)
-            mouseDelta = glm::normalize(mouseDelta) * mouseMaxMove;
+        fixed_update();
+        
+        fixedUpdateDelta = glfwGetTime() - fixedUpdatePrev;
+        fixedUpdatePrev = glfwGetTime();
 
-        camera.process_mouse(mouseDelta.x, mouseDelta.y, io.DeltaTime);
+        avg[slide] = fixedUpdateDelta;
+        slide++;
+        slide %= avg.size();
+
+        nextFixedUpdate += core::Game::SkipRate;
+        loops++;
     }
 
-    if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_W))
-    {
-        camera.move_relative_to_target(io.DeltaTime, render::Direction::Forward);
-    }
-    if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_A))
-    {
-        camera.move_relative_to_target(io.DeltaTime, render::Direction::Left);
-    }
-    if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_S))
-    {
-        camera.move_relative_to_target(io.DeltaTime, render::Direction::Backward);
-    }
-    if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_D))
-    {
-        camera.move_relative_to_target(io.DeltaTime, render::Direction::Right);
-    }
+    return (float)((glfwGetTime() * 1000) + core::Game::SkipRate - nextFixedUpdate) / (float)(core::Game::SkipRate);
+}
+
+double scrinks::Window::fixed_updates_per_second()
+{
+    double total = 0;
+    for (double sample : avg)
+        total += sample;
+
+    return 1 / (total/avg.size());
 }
 
 void scrinks::Window::run_loop()
@@ -169,14 +180,10 @@ void scrinks::Window::run_loop()
     {
         glfwPollEvents();
 
-        if (s_inputActive)
-        {
-            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-            handle_input();
-        }
-        oldActive = s_inputActive;
+        float interpolation{ check_fixed_update_timer() };
 
-        render::Pipeline::draw();
+        render::Pipeline::draw(interpolation);
+
         editor::render_ui();
 
         glfwSwapBuffers(s_window);

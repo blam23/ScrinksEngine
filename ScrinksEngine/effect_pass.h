@@ -19,7 +19,7 @@ namespace scrinks::render::pass
 	public:
 		virtual ~EffectPass() {};
 		void init();
-		void draw() override;
+		void draw(float) override;
 
 	protected:
 		EffectPass(const std::string& bufferName, const render::BufferFormat& bufferFormat);

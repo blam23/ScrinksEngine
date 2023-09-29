@@ -27,9 +27,9 @@ namespace scrinks::render
 		GLint width;
 		GLint height;
 	};
-	using BufferManager = AssetManager<BufferDescriptor, Buffer>;
+	using BufferManager = core::AssetManager<BufferDescriptor, Buffer>;
 
-	class Buffer : public Asset
+	class Buffer : public core::Asset
 	{
 	public:
 		DISABLE_COPY(Buffer);

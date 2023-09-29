@@ -15,7 +15,7 @@ namespace scrinks::render::pass
 		ShadowMap* init(GLsizei mapSize);
 		ShadowMap* send_to_debug_ui();
 
-		void draw() override;
+		void draw(float interpolate) override;
 		void tag_outdated();
 
 	public:

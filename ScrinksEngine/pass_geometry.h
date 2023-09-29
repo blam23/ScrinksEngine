@@ -13,7 +13,7 @@ namespace scrinks::render::pass
 
 	public:
 		void init();
-		void draw() override;
+		void draw(float interpolate) override;
 
 	private:
 		void resize(GLsizei width, GLsizei height) override;

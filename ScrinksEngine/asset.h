@@ -6,7 +6,7 @@
 #include <string>
 #include "helpers.h"
 
-namespace scrinks::render
+namespace scrinks::core
 {
 	class Asset
 	{
