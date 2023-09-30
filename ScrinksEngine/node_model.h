@@ -18,6 +18,8 @@ namespace scrinks::core::nodes
 
 	protected:
 		virtual const std::string_view default_name() const { return "Model"; }
+		virtual void setup_script_data() override;
+
 
 	private:
 		std::shared_ptr<render::Model> m_model;

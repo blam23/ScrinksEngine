@@ -19,12 +19,14 @@ namespace scrinks::core
 		inline std::uint32_t id() const { return m_id; }
 
 		void tag_outdated() { m_outdated = true; }
+		const std::string& asset_name() const { return m_name; }
 
 	protected:
-		Asset(std::uint32_t id);
+		Asset(const std::string& name, std::uint32_t id);
 		bool m_outdated{ false };
 		bool m_loaded{ false };
 		std::uint32_t m_id{ 0 };
+		const std::string m_name;
 	};
 
 	template <typename T_Descriptor, typename T_Asset>
@@ -47,7 +49,7 @@ namespace scrinks::core
 		static AssetManager& instance();
 
 	private:
-		std::shared_ptr<T_Asset> load(const T_Descriptor& description);
+		std::shared_ptr<T_Asset> load(const std::string& name, const T_Descriptor& description);
 
 		std::map<std::string, std::pair<T_Descriptor, std::shared_ptr<T_Asset>>> m_store{};
 
@@ -65,7 +67,7 @@ namespace scrinks::core
 		if (itr != m_store.end())
 			return itr->second.second;
 
-		const auto asset{ load(description) };
+		const auto asset{ load(name, description) };
 
 		// Only replace if the asset is actually loaded
 		if (asset && asset->is_loaded())
@@ -73,7 +75,9 @@ namespace scrinks::core
 			const auto [idx, success] = m_store.try_emplace(name, std::pair(description, asset));
 
 			if (success)
+			{
 				return idx->second.second;
+			}
 		}
 
 		return nullptr;
@@ -96,7 +100,7 @@ namespace scrinks::core
 
 		if (idx != m_store.end())
 		{
-			std::shared_ptr<T_Asset> reloaded = load(idx->second.first);
+			std::shared_ptr<T_Asset> reloaded = load(name, idx->second.first);
 
 			if (reloaded->is_loaded())
 			{

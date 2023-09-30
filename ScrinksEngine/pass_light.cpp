@@ -46,10 +46,10 @@ void DeferredLighting::setup_draw()
     m_shader->set_param("ambientLightDir", glm::vec3(-2.0, 11.0, 7.0f));
     m_shader->set_param("ambientLightColour", glm::vec3(1.0f, 1.0f, 1.0f));
     m_shader->set_param("ambientLightIntensity", 0.2f);
-    m_shader->set_param("inverseView", glm::inverse(Pipeline::camera().view()));
+    m_shader->set_param<const glm::mat4&>("inverseView", glm::inverse(Pipeline::camera().view()));
 
     if (m_map)
-        m_shader->set_param("lightSpaceMatrix", m_map->get_light_space());
+        m_shader->set_param<const glm::mat4&>("lightSpaceMatrix", m_map->get_light_space());
 
     m_shader->set_test_param("testA");
     m_shader->set_test_param("testB");

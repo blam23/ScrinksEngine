@@ -11,8 +11,8 @@ using namespace scrinks::render;
 #pragma warning (pop)
 
 
-Texture::Texture(Badge<TextureManager>, GLuint id, GLuint width, GLuint height, GLuint channels)
-	: Asset{ id }, m_width{ width }, m_height{ height }, m_channels{ channels }
+Texture::Texture(Badge<TextureManager>, const std::string& name, GLuint id, GLuint width, GLuint height, GLuint channels)
+	: Asset{ name, id }, m_width{ width }, m_height{ height }, m_channels{ channels }
 {
 	m_loaded = true;
 }
@@ -32,7 +32,7 @@ void Texture::bind(GLenum unit) const
 }
 
 template <>
-std::shared_ptr<Texture> TextureManager::load(const TextureDescription& path)
+std::shared_ptr<Texture> TextureManager::load(const std::string& name, const TextureDescription& path)
 {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -62,7 +62,7 @@ std::shared_ptr<Texture> TextureManager::load(const TextureDescription& path)
 
 		stbi_image_free(data);
 
-		return std::make_shared<Texture>(Badge<TextureManager>{}, id, width, height, channels);
+		return std::make_shared<Texture>(Badge<TextureManager>{}, name, id, width, height, channels);
 	}
 	stbi_image_free(data);
 

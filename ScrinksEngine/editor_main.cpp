@@ -64,35 +64,35 @@ ImColor info_regular{ ImColor{ 230, 230, 230 } };
 ImColor info_highlight{ ImColor{ 120, 230, 230 } };
 void menu()
 {
-    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    //const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    // Set position to the bottom of the viewport
-    ImGui::SetNextWindowPos(
-        ImVec2(viewport->Pos.x,
-            viewport->Pos.y + viewport->Size.y - ImGui::GetFrameHeight()));
+    //// Set position to the bottom of the viewport
+    //ImGui::SetNextWindowPos(
+    //    ImVec2(viewport->Pos.x,
+    //        viewport->Pos.y + viewport->Size.y - ImGui::GetFrameHeight()));
 
-    // Extend width to viewport width
-    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, ImGui::GetFrameHeight()));
+    //// Extend width to viewport width
+    //ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, ImGui::GetFrameHeight()));
 
-    // Add menu bar flag and disable everything else
-    ImGuiWindowFlags flags =
-        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs |
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse |
-        ImGuiWindowFlags_NoSavedSettings |
-        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBackground |
-        ImGuiWindowFlags_MenuBar;
+    //// Add menu bar flag and disable everything else
+    //ImGuiWindowFlags flags =
+    //    ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs |
+    //    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse |
+    //    ImGuiWindowFlags_NoSavedSettings |
+    //    ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBackground |
+    //    ImGuiWindowFlags_MenuBar;
 
     bool vsyncEnabled = Window::is_vsync_enabled();
     auto& io = ImGui::GetIO();
 
-    ImGui::Begin("StatusBar", nullptr, flags);
+    ImGui::BeginMainMenuBar();
     {
         ImGui::Text("Scrinks");
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 295);
         ImGui::TextColored(vsyncEnabled ? info_regular : info_highlight, "%.3f ms/frame (%.1f FPS) [%.1f fixed]", 1000.0f / io.Framerate, io.Framerate, Window::fixed_updates_per_second());
     }
-    ImGui::End();
+    ImGui::EndMainMenuBar();
 }
 
 void check_inputs()
@@ -185,9 +185,7 @@ void editor::render_ui()
 
         check_inputs();
 
-        menu();
-
-        scene_tree();
+        //scene_tree();
         
         if (drawDebug)
             render_debug();
@@ -196,6 +194,8 @@ void editor::render_ui()
 
         for (const auto func : windowCallbacks)
             (*func)();
+
+        menu();
     }
     ImGui::Render();
 

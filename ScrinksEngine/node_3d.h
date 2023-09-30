@@ -9,7 +9,7 @@ namespace scrinks::core
 	struct Transform
 	{
 		glm::vec3 pos{};
-		glm::quat rot{};
+		glm::quat rot{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 scale{ 1.0f };
 
 		glm::mat4 matrix() const
@@ -30,9 +30,7 @@ namespace scrinks::core
 
 	protected:
 		virtual const std::string_view default_name() const { return "Node3D"; }
-
-	public:
-		static void register_lua_methods();
+		virtual void setup_script_data() override;
 
 	public:
 		glm::mat4 mat4(float interpolate) const { return glm::mix(m_previous.matrix(), m_current.matrix(), interpolate); }
@@ -48,6 +46,7 @@ namespace scrinks::core
 		void translate(float x, float y, float z);
 		void rotate(float angle, const glm::vec3& axis);
 		void set_scale(float amount);
+		void set_scale(float x, float y, float z);
 		void set_rotation(glm::quat&);
 
 	private:

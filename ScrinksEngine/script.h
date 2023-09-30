@@ -1,7 +1,9 @@
 #pragma once
 
 #include "helpers.h"
+#include "lua_engine.h"
 #include "asset.h"
+#include <map>
 
 namespace scrinks::lua
 {
@@ -13,11 +15,13 @@ namespace scrinks::lua
 	class Script : public core::Asset
 	{
 	public:
-		Script(Badge<ScriptManager>, const std::string& code);
+		Script(Badge<ScriptManager>, const std::string& file, const std::string& code);
 
 	public:
-		template <typename T>
-		void call(T* caller);
+		sol::function_result run(sol::environment& env);
+
+	private:
+		sol::function m_code;
 	};
 }
 

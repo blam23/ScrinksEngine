@@ -33,8 +33,8 @@ GLuint compile_shader(const char* code, GLenum type)
 	return shader;
 }
 
-Shader::Shader(Badge<ShaderManager>, const std::string& vertexShader, const std::string& fragmentShader)
-	: Asset{ 0 }
+Shader::Shader(Badge<ShaderManager>, const std::string& name, const std::string& vertexShader, const std::string& fragmentShader)
+	: Asset{ name, 0 }
 {
 	GLuint vertID = compile_shader(vertexShader.c_str(), GL_VERTEX_SHADER);
 	GLuint fragID = compile_shader(fragmentShader.c_str(), GL_FRAGMENT_SHADER);
@@ -67,7 +67,7 @@ Shader::~Shader()
 }
 
 template <>
-std::shared_ptr<Shader> ShaderManager::load(const ShaderDescription& description)
+std::shared_ptr<Shader> ShaderManager::load(const std::string& name, const ShaderDescription& description)
 {
 	std::string vCode, fCode;
 	std::ifstream vFile, fFile;
@@ -91,7 +91,7 @@ std::shared_ptr<Shader> ShaderManager::load(const ShaderDescription& description
 		vCode = vStream.str();
 		fCode = fStream.str();
 
-		return std::make_shared<Shader>(Badge<ShaderManager>{}, vCode, fCode);
+		return std::make_shared<Shader>(Badge<ShaderManager>{}, name, vCode, fCode);
 	}
 	catch (std::ifstream::failure error)
 	{
@@ -197,7 +197,7 @@ void Shader::set_param(const std::string& name, const glm::mat4& value) const
 	glUniformMatrix4fv(glGetUniformLocation(m_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 template <>
-void Shader::set_param(const std::string& name, glm::mat4 value) const
+void Shader::set_param(const std::string& name, glm::mat4& value) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(m_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }

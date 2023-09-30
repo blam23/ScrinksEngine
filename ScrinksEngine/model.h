@@ -15,7 +15,7 @@ namespace scrinks::render
 	class Model : public core::Asset
 	{
 	public:
-		Model(Badge<ModelManager>, std::vector<Mesh>&& meshes);
+		Model(Badge<ModelManager>, const std::string& name, std::vector<Mesh>&& meshes);
 
 		void draw(std::shared_ptr<Shader> shader) const;
 

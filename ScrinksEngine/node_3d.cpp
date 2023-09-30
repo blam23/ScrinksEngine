@@ -3,52 +3,31 @@
 
 using namespace scrinks::core;
 
-static scrinks::lua::Engine& engine{ scrinks::lua::Engine::instance };
-
-scrinks::core::Node3D::Node3D(Node* parent, const Transform& position)
+Node3D::Node3D(Node* parent, const Transform& position)
 	: m_current{ position }
 	, m_previous{ position }
 	, Node { parent }
 {
 }
 
-namespace binds
+void scrinks::core::Node3D::setup_script_data()
 {
-	int set_pos(lua_State* state)
-	{
-		lua_checkstack(state, 3);
-		lua_isnumber(state, 1);
-		lua_isnumber(state, 2);
-		lua_isnumber(state, 3);
+	m_script_env["set_pos"]
+		= [this] (float x, float y, float z) { return set_position(x, y, z); };
 
-		float x{ (float)lua_tonumber(state, 1) };
-		float y{ (float)lua_tonumber(state, 2) };
-		float z{ (float)lua_tonumber(state, 3) };
+	m_script_env["translate"]
+		= [this] (float x, float y, float z) { return translate(x, y, z); };
 
-		Node3D* caller = (Node3D*)engine.calling_node();
-		caller->set_position(x, y, z);
-		
-		return 0;
-	}
+	m_script_env["rotate"]
+		= [this] (float a, float x, float y, float z) { return rotate(a, glm::vec3{ x, y, z }); };
+
+	m_script_env["set_scale"]
+		= [this] (float x, float y, float z) { return set_scale(x, y, z); };
+
+	Node::setup_script_data();
 }
 
-void _bind(lua_State* L, const std::string& name, lua_CFunction func)
-{
-	lua_pushstring(L, name.c_str());
-	lua_pushcfunction(L, func);
-	lua_settable(L, -3);
-}
-
-void scrinks::core::Node3D::register_lua_methods()
-{
-	lua_State* L{ engine.m_state };
-
-	lua_newtable(L);
-	_bind(L, "set_pos", &binds::set_pos);
-	lua_setglobal(L, "Node3D");
-}
-
-void scrinks::core::Node3D::fixed_update()
+void Node3D::fixed_update()
 {
 	m_previous = m_current;
 	Node::fixed_update();
@@ -64,27 +43,33 @@ void Node3D::set_position(float x, float y, float z)
 	m_current.pos = glm::vec3(x, y, z);
 }
 
-void scrinks::core::Node3D::translate(const glm::vec3& offset)
+void Node3D::translate(const glm::vec3& offset)
 {
 	m_current.pos += offset;
 }
 
-void scrinks::core::Node3D::translate(float x, float y, float z)
+void Node3D::translate(float x, float y, float z)
 {
 	m_current.pos += glm::vec3(x, y, z);
 }
 
-void scrinks::core::Node3D::rotate(float amount, const glm::vec3& axis)
+void Node3D::rotate(float amount, const glm::vec3& axis)
 {
 	m_current.rot = glm::rotate(m_current.rot, amount, axis);
 }
 
-void scrinks::core::Node3D::set_scale(float amount)
+void Node3D::set_scale(float amount)
 {
 	m_current.scale = glm::vec3(amount);
 }
 
-void scrinks::core::Node3D::set_rotation(glm::quat& q)
+void Node3D::set_scale(float x, float y, float z)
+{
+	m_current.scale = glm::vec3(x, y, z);
+}
+
+
+void Node3D::set_rotation(glm::quat& q)
 {
 	m_current.rot = q;
 }

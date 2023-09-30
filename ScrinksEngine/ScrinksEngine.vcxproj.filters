@@ -143,9 +143,6 @@
     <ClCompile Include="script.cpp">
       <Filter>core\lua</Filter>
     </ClCompile>
-    <ClCompile Include="lua_init_nodes.cpp">
-      <Filter>core\lua</Filter>
-    </ClCompile>
     <ClCompile Include="node_3d.cpp">
       <Filter>core\nodes</Filter>
     </ClCompile>
@@ -247,9 +244,6 @@
     <ClInclude Include="script.h">
       <Filter>core\lua\headers</Filter>
     </ClInclude>
-    <ClInclude Include="lua_init_nodes.h">
-      <Filter>core\lua\headers</Filter>
-    </ClInclude>
     <ClInclude Include="node_model.h">
       <Filter>core\nodes\headers</Filter>
     </ClInclude>
@@ -258,6 +252,9 @@
     </ClInclude>
     <ClInclude Include="inspector_node3d.h">
       <Filter>editor\inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="node_threads.h">
+      <Filter>core\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

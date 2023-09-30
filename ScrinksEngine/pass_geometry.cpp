@@ -42,8 +42,8 @@ void Geometry::draw(float interpolate)
         m_shader->use_program();
     }
 
-    m_shader->set_param("view", Pipeline::camera().view());
-    m_shader->set_param("projection", Pipeline::projection());
+    m_shader->set_param<const glm::mat4&>("view", Pipeline::camera().view());
+    m_shader->set_param<const glm::mat4&>("projection", Pipeline::projection());
 
     render::Drawable<core::nodes::DynamicModel>::draw_list(m_shader, interpolate);
 

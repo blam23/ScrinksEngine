@@ -79,8 +79,8 @@ void SSAO::setup_draw()
 	m_shader->use_program();
 	m_shader->set_param("screenWidth", Pipeline::view_width());
 	m_shader->set_param("screenHeight", Pipeline::view_height());
-	m_shader->set_param("projection", Pipeline::projection());
-	m_shader->set_param("view", Pipeline::camera().view());
+	m_shader->set_param<const glm::mat4&>("projection", Pipeline::projection());
+	m_shader->set_param<const glm::mat4&>("view", Pipeline::camera().view());
 	m_shader->set_param("gPosition", 0);
 	m_shader->set_param("gNormal", 1);
 	m_shader->set_param("texNoise", 2);

@@ -47,7 +47,7 @@ namespace scrinks::render
 		static void bind(GLenum slot, const std::string bufferName);
 
 	public:
-		Buffer(Badge<BufferManager>, BufferDescriptor desc);
+		Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor desc);
 		~Buffer();
 
 		inline GLuint attachment() const { return m_attachment; }

@@ -26,7 +26,7 @@ namespace scrinks::render
 	class Shader : public core::Asset
 	{
 	public:
-		Shader(Badge<ShaderManager>, const std::string& vertexShader, const std::string& fragmentShader);
+		Shader(Badge<ShaderManager>, const std::string& name, const std::string& vertexShader, const std::string& fragmentShader);
 		~Shader();
 
 	public:

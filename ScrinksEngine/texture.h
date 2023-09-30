@@ -15,7 +15,7 @@ namespace scrinks::render
 	class Texture : public core::Asset
 	{
 	public:
-		Texture(Badge<TextureManager>, uint32_t id, GLuint width, GLuint height, GLuint channels);
+		Texture(Badge<TextureManager>, const std::string& name, uint32_t id, GLuint width, GLuint height, GLuint channels);
 		~Texture();
 
 		inline GLuint width() const { return m_width; }

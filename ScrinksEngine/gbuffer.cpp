@@ -28,11 +28,11 @@ void Buffer::bind(GLenum slot, const std::string bufferName)
 	glBindTexture(GL_TEXTURE_2D, buffer->id());
 }
 
-Buffer::Buffer(Badge<BufferManager>, BufferDescriptor descriptor)
+Buffer::Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor descriptor)
 	: m_attachment{ descriptor.attachment }
 	, m_width{ descriptor.width }
 	, m_height{ descriptor.height }
-	, Asset{ 0 }
+	, Asset{ name, 0 }
 {
 	const auto& metadata = get_format_meta_data(descriptor.format);
 
@@ -62,9 +62,9 @@ void bind(const std::shared_ptr<Buffer>& buffer)
 }
 
 template <>
-std::shared_ptr<Buffer> BufferManager::load(const BufferDescriptor& description)
+std::shared_ptr<Buffer> BufferManager::load(const std::string& name, const BufferDescriptor& description)
 {
-	return std::make_shared<Buffer>(Badge<BufferManager>{}, description);
+	return std::make_shared<Buffer>(Badge<BufferManager>{}, name, description);
 }
 
 void GBuffer::setup_buffers()

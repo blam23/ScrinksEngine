@@ -10,8 +10,8 @@
 
 using namespace scrinks::render;
 
-scrinks::render::Model::Model(Badge<ModelManager>, std::vector<Mesh>&& meshes)
-	: Asset{ 0 }
+scrinks::render::Model::Model(Badge<ModelManager>, const std::string& name, std::vector<Mesh>&& meshes)
+	: Asset{ name, 0 }
 	, m_meshes{ std::move(meshes) }
 {
 	m_loaded = true;
@@ -97,7 +97,7 @@ void collect(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, cons
 }
 
 template <>
-std::shared_ptr<Model> ModelManager::load(const ModelDescription& path)
+std::shared_ptr<Model> ModelManager::load(const std::string& name, const ModelDescription& path)
 {
 	Assimp::Importer importer;
 	const aiScene* scene{ importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs) };
@@ -113,5 +113,5 @@ std::shared_ptr<Model> ModelManager::load(const ModelDescription& path)
 	std::vector<Mesh> meshes;
 	collect(scene->mRootNode, scene, meshes, relativePath);
 
-	return std::make_shared<Model>(Badge<ModelManager>{}, std::move(meshes));
+	return std::make_shared<Model>(Badge<ModelManager>{}, name, std::move(meshes));
 }

@@ -12,7 +12,15 @@ DynamicModel::DynamicModel(Node* parent, std::shared_ptr<render::Model> model, c
 
 void DynamicModel::draw(std::shared_ptr<render::Shader> shader, float interpolate)
 {
-	shader->set_param("model", mat4(interpolate));
+	shader->set_param<const glm::mat4&>("model", mat4(interpolate));
 	m_model->draw(shader);
+}
+
+void DynamicModel::setup_script_data()
+{
+	m_script_env["visible"]
+		= [this] (bool v) { return m_visible = v; };
+	
+	Node3D::setup_script_data();
 }
 

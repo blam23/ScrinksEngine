@@ -11,4 +11,8 @@ run = function(file)
     return script()
 end
 
+-- scripts changing environment will just make things complex
+local __fenv = setfenv
+setfenv = nil
+
 require "lib.class"

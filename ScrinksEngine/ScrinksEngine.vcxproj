@@ -110,9 +110,9 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLM_FORCE_SILENT_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLM_FORCE_SILENT_WARNINGS;LUA_USE_ASSERT;LUA_USE_APICHECK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;GLM_FORCE_SILENT_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>luajit;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -155,7 +155,6 @@
     <ClCompile Include="include\imGuIZMO.quat\imGuIZMOquat.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="lua_engine.cpp" />
-    <ClCompile Include="lua_init_nodes.cpp" />
     <ClCompile Include="metadata_helpers.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="gbuffer.cpp" />
@@ -193,10 +192,10 @@
     <ClInclude Include="input.h" />
     <ClInclude Include="inspector_node3d.h" />
     <ClInclude Include="lua_engine.h" />
-    <ClInclude Include="lua_init_nodes.h" />
     <ClInclude Include="metadata_helpers.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="node_model.h" />
+    <ClInclude Include="node_threads.h" />
     <ClInclude Include="script.h" />
     <ClInclude Include="node_3d.h" />
     <ClInclude Include="pass_post_processing.h" />

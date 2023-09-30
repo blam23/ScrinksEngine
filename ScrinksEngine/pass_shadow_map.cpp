@@ -72,8 +72,8 @@ ShadowMap* ShadowMap::send_to_debug_ui()
 
 void ShadowMap::draw(float interpolate)
 {
-    //if (!m_outdated)
-    //    return;
+    if (!m_outdated)
+        return;
 
     glEnable(GL_DEPTH_TEST);
     //glCullFace(GL_FRONT);  // peter panning
@@ -84,7 +84,7 @@ void ShadowMap::draw(float interpolate)
         glClear(GL_DEPTH_BUFFER_BIT);
 
         m_shader->use_program();
-        m_shader->set_param("lightProjection", get_light_space());
+        m_shader->set_param<const glm::mat4&>("lightProjection", get_light_space());
 
         core::nodes::DynamicModel::draw_list(m_shader, interpolate);
 
@@ -96,7 +96,7 @@ void ShadowMap::draw(float interpolate)
     
     glCullFace(GL_BACK);
 
-    m_outdated = false;
+    //m_outdated = false;
 }
 
 void ShadowMap::resize(GLsizei, GLsizei)

@@ -2,6 +2,7 @@
 
 #include "helpers.h"
 #include "script.h"
+#include "lua_engine.h"
 #include <vector>
 #include <cstdint>
 #include <string>
@@ -33,12 +34,23 @@ namespace scrinks::core
 		virtual void attached() {}
 		virtual void removed() {}
 
+		void set_script(std::shared_ptr<lua::Script> script);
+
+		// If you're gonna add a shit tonne of child nodes..
+		void reserve_child_nodes(size_t amount);
+
 	protected:
 		virtual const std::string_view default_name() const { return "Node"; }
+		void run_func_checked(const std::string& func);
+		virtual void setup_script_data();
 
 	private:
 		void claim_child(Node& node);
 		void disown_child(Node& node);
+		void reload_script_if_outdated();
+
+	protected:
+		sol::environment m_script_env;
 
 	private:
 		Node* m_parent;
@@ -48,5 +60,6 @@ namespace scrinks::core
 		ID m_id;
 
 		static std::atomic<ID> s_id;
+
 	};
 };

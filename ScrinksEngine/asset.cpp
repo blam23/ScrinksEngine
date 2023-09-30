@@ -4,7 +4,8 @@
 
 using namespace scrinks::core;
 
-Asset::Asset(std::uint32_t id)
-	: m_id{ id }
+Asset::Asset(const std::string& name, std::uint32_t id)
+	: m_name{ name }
+	, m_id{ id }
 {
 }
