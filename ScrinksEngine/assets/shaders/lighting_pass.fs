@@ -20,7 +20,7 @@ struct Light {
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
-uniform vec3 ambientLightDir;
+const vec3 ambientLightDir = vec3(0.5, -1.0, 1.0);
 uniform vec3 ambientLightColour;
 uniform float ambientLightIntensity;
 uniform mat4 inverseView;
@@ -40,7 +40,7 @@ float calc_shadow(vec3 pos, vec3 normal)
     float closestDepth = texture(shadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
-    float bias = 0.002;
+    float bias = 0.005;
     float shadow = 0.0;
 
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
@@ -66,8 +66,7 @@ void main()
     vec3  albedo      = sample.rgb;
     float sampleSpec  = sample.a;
     float depth       = texture(gDepth, texCoord).r;
-    vec3  viewNormal  = texture(gNormal, texCoord).rgb;
-    vec3  worldNormal = viewNormal * transpose(mat3(inverseView));
+    vec3  worldNormal = texture(gNormal, texCoord).rgb;
     float ao          = texture(ssao, texCoord).r;
     vec3  viewPos     = (texture(gPosition, texCoord)).xyz;
     vec3  worldPos    = (inverseView * vec4(viewPos, 1.0)).xyz;
