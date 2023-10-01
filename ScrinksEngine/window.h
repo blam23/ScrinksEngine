@@ -29,6 +29,9 @@ namespace scrinks
 		static void set_capture_cursor(bool capture);
 		static void register_for_fixed_updates(FixedUpdateCallback func);
 		static double fixed_updates_per_second();
+		
+		// If this is above noise levels we're in trouble
+		static inline double last_script_await_time() { return s_lastScriptAwaitDuration; }
 
 	public:
 		static int s_windowWidth;
@@ -47,5 +50,6 @@ namespace scrinks
 		static GLenum s_log_level;
 
 		static std::vector<FixedUpdateCallback> s_fixedUpdateCallbacks;
+		static double s_lastScriptAwaitDuration;
 	};
 }

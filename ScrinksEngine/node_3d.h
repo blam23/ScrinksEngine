@@ -41,7 +41,7 @@ namespace scrinks::core
 		glm::quat& rot() { return m_current.rot; }
 		glm::vec3& scale() { return m_current.scale; }
 
-		void fixed_update() override;
+		void sync_fixed_update() override;
 
 		void set_position(const glm::vec3& pos);
 		void set_position(float x, float y, float z);

@@ -24,6 +24,7 @@ int dbgTextureID{ 0 };
 editor::AssetNameCache<render::TextureManager> textureNameCache{};
 editor::AssetNameCache<render::BufferManager>  bufferNameCache{};
 editor::AssetNameCache<render::ShaderManager>  shaderNameCache{};
+editor::AssetNameCache<lua::ScriptManager>     scriptNameCache{};
 
 float timeSinceRefresh = 0.0f;
 int refreshIndex = 0;
@@ -42,6 +43,7 @@ void refresh_caches_as_needed(float interval = 100)
         case 0: textureNameCache.refresh(); break;
         case 1: bufferNameCache.refresh(); break;
         case 2: shaderNameCache.refresh(); break;
+        case 3: scriptNameCache.refresh(); break;
         default: refreshIndex = 0; break;
     }
 
@@ -194,6 +196,30 @@ void assets()
         if (ImGui::BeginListBox("##hidelabel"))
         {
             for (const auto& name : shaderNameCache)
+            {
+                ImGui::Selectable(name.c_str(), &ignoreSelect);
+            }
+            ImGui::EndListBox();
+        }
+        ImGui::PopItemWidth();
+    }
+    ImGui::End();
+
+    static float scriptTimes[512];
+    static std::size_t scriptPtr = 0;
+    scriptTimes[scriptPtr++] = (float)Window::last_script_await_time();
+    scriptPtr %= 512;
+
+    if (ImGui::Begin("Scripts"))
+    {
+        ImGui::PlotLines("Script Times", scriptTimes, 512);
+        ImGui::Text("Last Await Time: %3.fms", Window::last_script_await_time() * 1000.f);
+
+        bool ignoreSelect;
+        ImGui::PushItemWidth(-1);
+        if (ImGui::BeginListBox("##hidelabel"))
+        {
+            for (const auto& name : scriptNameCache)
             {
                 ImGui::Selectable(name.c_str(), &ignoreSelect);
             }

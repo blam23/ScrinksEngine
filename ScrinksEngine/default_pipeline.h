@@ -11,9 +11,9 @@ namespace scrinks::render
 {
 	void default_pipeline()
 	{
-		pass::ShadowMap* map = Pipeline::register_pass<pass::ShadowMap>()
-			->init(4096)
-			->send_to_debug_ui();
+		//pass::ShadowMap* map = Pipeline::register_pass<pass::ShadowMap>()
+		//	->init(4096)
+		//	->send_to_debug_ui();
 
 		Pipeline::register_pass<pass::Geometry>()
 			->init();
@@ -25,7 +25,7 @@ namespace scrinks::render
 			->init();
 
 		Pipeline::register_pass<pass::DeferredLighting>()
-			->set_shadow_map(map)
+			//->set_shadow_map(map)
 			->init();
 
 		Pipeline::register_pass<pass::PostProcessing>()

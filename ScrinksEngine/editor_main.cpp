@@ -185,7 +185,7 @@ void editor::render_ui()
 
         check_inputs();
 
-        //scene_tree();
+        scene_tree();
         
         if (drawDebug)
             render_debug();

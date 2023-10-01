@@ -18,6 +18,7 @@
 
 namespace scrinks::threads
 {
+
 	enum class Group
 	{
 		Main,           // High priority, single <main> thread
@@ -39,21 +40,27 @@ namespace scrinks::threads
 	{
 		DISABLE_COPY_AND_MOVE(Reference);
 
-		Reference(Group group);
+		Reference(void*, Group);
 		~Reference();
 
 		ID m_thread_id;
+		void* m_node;
 	};
 
 	constexpr uint8_t MainThreadID = 0;
 	constexpr uint8_t BackgroundThreadID = 1;
 
+	void register_node(Reference& thread, void* node);
+	void unregister_node(Reference& thread, void* node);
+
 	bool on_my_thread(Reference& manager);
 	
-	using FuncType = std::function<void()>;
+	using FuncType = std::function<void(void*)>;
 	using FuncTypePtr = std::shared_ptr<FuncType>;
 	bool on_window_thread();
 	void dispatch_and_wait(FuncType func);
+	void dispatch_async(FuncType func); // TODO: return event to wait for if you need to sync?
+	void await_previous();
 	void dispatch_singular_and_wait(const Reference& thread, FuncType func);
 	void setup();
 	void shutdown();

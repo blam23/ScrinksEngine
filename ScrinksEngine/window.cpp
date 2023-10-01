@@ -127,18 +127,15 @@ bool Window::init(int width, int height, const std::string& name)
     return true;
 }
 
+
+double scrinks::Window::s_lastScriptAwaitDuration{ 0 };
 void scrinks::Window::fixed_update()
 {
-    //for (auto itr = s_fixedUpdateCallbacks.begin(); itr != s_fixedUpdateCallbacks.end(); itr++)
-    //{
-    //    if (*itr)
-    //        (*itr)();
-    //    else
-    //        s_fixedUpdateCallbacks.erase(itr);
-    //}
-
-    //core::Game::fixed_update();
-    threads::dispatch_and_wait(&core::Game::fixed_update);
+    double pre = glfwGetTime();
+    threads::await_previous();
+    core::Game::sync_fixed_update();
+    threads::dispatch_async(&core::Node::dispatch_fixed_update);
+    s_lastScriptAwaitDuration = glfwGetTime() - pre;
 }
 
 std::array<double,20> avg{ 0.0 };
@@ -183,6 +180,7 @@ void scrinks::Window::run_loop()
         glfwPollEvents();
 
         float interpolation{ check_fixed_update_timer() };
+        interpolation = glm::clamp(interpolation, 0.0f, 1.0f);
 
         render::Pipeline::draw(interpolation);
 

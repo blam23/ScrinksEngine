@@ -14,14 +14,8 @@ Node::Node(Node* m_parent, threads::Group threadGroup)
 	: m_name{}
 	, m_script{ nullptr }
 	, m_id { s_id++ }
-	, m_thread{ threads::Reference{ threadGroup } }
+	, m_thread{ threads::Reference{ this, threadGroup } }
 {
-	threads::dispatch_singular_and_wait(m_thread,
-		[&] ()
-		{
-			m_script_env = lua::create_env();
-		});
-
 	if (m_parent)
 		m_parent->claim_child(*this);
 }
@@ -79,16 +73,51 @@ void Node::reload_script_if_outdated()
 	}
 }
 
-void Node::fixed_update()
+bool scrinks::core::Node::check_has_field(const std::string& name)
 {
-	if (threads::on_my_thread(m_thread))
-		run_func_checked("fixed_update");
+	if (m_script && m_script_env.valid())
+	{
+		sol::function luaFunc = m_script_env[name];
+		return luaFunc.valid();
+	}
+
+	return false;
+}
+
+void Node::sync_fixed_update()
+{
+	if (m_has_fixed_update)
+		run_func_checked("sync_fixed_update");
 
 	for (Node* child : m_children)
 	{
 		if (child)
-			child->fixed_update();
+			child->sync_fixed_update();
 	}
+}
+
+void Node::fixed_update()
+{
+	if (!m_init_lua && m_script)
+	{
+		m_script_env = lua::create_env();
+		auto res = m_script->run_no_cache(m_script_env);
+		if (!res.valid())
+		{
+			sol::error err = res;
+			std::cerr << "Failed to set script: " << err.what() << std::endl;
+		}
+
+		setup_script_data();
+		run_func_checked("script_added");
+
+		m_has_fixed_update = check_has_field("fixed_update");
+		m_has_sync_fixed_update = check_has_field("sync_fixed_update");
+		m_init_lua = true;
+	}
+
+	if (m_has_fixed_update)
+		run_func_checked("fixed_update");
 }
 
 void scrinks::core::Node::check_resources()
@@ -104,25 +133,8 @@ void scrinks::core::Node::check_resources()
 
 void Node::set_script(std::shared_ptr<lua::Script> script)
 {
+	m_init_lua = false;
 	m_script = script;
-
-	if (m_script)
-	{
-		threads::dispatch_singular_and_wait(m_thread,
-			[&] ()
-			{
-				m_script_env = lua::create_env();
-				auto res = m_script->run_no_cache(m_script_env);
-				if (!res.valid())
-				{
-					sol::error err = res;
-					std::cerr << "Failed to set script: " << err.what() << std::endl;
-				}
-
-				setup_script_data();
-				run_func_checked("script_added");
-			});
-	}
 }
 
 void Node::setup_script_data()

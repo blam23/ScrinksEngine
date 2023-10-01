@@ -23,13 +23,13 @@ void scrinks::core::Game::init(std::unique_ptr<Node>&& r)
 		calcNode->set_visible(false);
 	}
 	 
-	new nodes::DynamicModel(s_root.get(), render::ModelManager::instance().load_and_store("grass", "D:/assets/voxel/monu1.obj"), {});
+	new nodes::DynamicModel(s_root.get(), render::ModelManager::instance().load_and_store("grass", "D:/assets/voxel/big_crap_grass.obj"), {});
 }
 
-void Game::fixed_update()
+void Game::sync_fixed_update()
 {
 	if (s_root)
-		s_root->fixed_update();
+		s_root->sync_fixed_update();
 }
 
 void Game::check_resources()
