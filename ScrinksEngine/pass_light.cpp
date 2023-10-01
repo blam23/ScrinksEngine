@@ -41,7 +41,7 @@ void DeferredLighting::setup_draw()
     Buffer::bind(GL_TEXTURE2, "albedo");
     Buffer::bind(GL_TEXTURE3, "depth");
     Buffer::bind(GL_TEXTURE4, "ssao");
-    //Buffer::bind(GL_TEXTURE5, "shadow_map");
+    Buffer::bind(GL_TEXTURE5, "shadow_map");
 
     m_shader->set_param("ambientLightDir", glm::vec3(-2.0, 11.0, 7.0f));
     m_shader->set_param("ambientLightColour", glm::vec3(1.0f, 1.0f, 1.0f));
