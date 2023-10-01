@@ -1,15 +1,17 @@
 #include "window.h"
-#include "lua_engine.h"
+#include "thread_pool.h"
+
+using namespace scrinks;
 
 int main()
 {
-    if (!scrinks::lua::setup())
-        return 1;
+    //threads::set_process_priority(threads::Priority::High);
+    threads::setup();
 
-    if (scrinks::Window::init(1920, 1080, "Scrinks!"))
-        scrinks::Window::run_loop();
+    if (Window::init(1920, 1080, "Scrinks!"))
+        Window::run_loop();
     
-    scrinks::Window::shutdown();
+    Window::shutdown();
 
     return 0;
 }

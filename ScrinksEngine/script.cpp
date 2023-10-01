@@ -8,6 +8,7 @@ using namespace scrinks::lua;
 
 Script::Script(Badge<ScriptManager>, const std::string& name, const std::string& code)
 	: Asset{ name, 0 }
+	, m_strCode{ code }
 {
 	sol::load_result res{ lua::load(code, name) };
 
@@ -27,6 +28,19 @@ sol::function_result Script::run(sol::environment& env)
 {
 	sol::set_environment(env, m_code);
 	return m_code();
+}
+
+sol::function_result Script::run_no_cache(sol::environment& env)
+{
+	sol::function res{ lua::load(m_strCode, m_name) };
+
+	if (res.valid())
+	{
+		sol::set_environment(env, res);
+		return res();
+	}
+
+	return {};
 }
 
 template <>

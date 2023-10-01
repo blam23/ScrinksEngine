@@ -3,6 +3,7 @@
 #include "helpers.h"
 #include "script.h"
 #include "lua_engine.h"
+#include "thread_pool.h"
 #include <vector>
 #include <cstdint>
 #include <string>
@@ -19,7 +20,7 @@ namespace scrinks::core
 		using ID = std::size_t;
 		constexpr static ID InvalidID{ (std::numeric_limits<ID>::max)() };
 
-		Node(Node* m_parent);
+		Node(Node* m_parent, threads::Group threadGroup = threads::Group::Main);
 		virtual ~Node();
 
 	public:
@@ -30,9 +31,10 @@ namespace scrinks::core
 		ID id() const { return m_id; }
 		void rename(const std::string& name) { m_name = name; }
 
-		virtual void fixed_update();
-		virtual void attached() {}
-		virtual void removed() {}
+		virtual void fixed_update();    // called at a fixed rate (per Game::TickRate)
+		virtual void check_resources(); // called when resources <may> have been updated.
+		virtual void attached() {}      // (just) attached to a parent node
+		virtual void removed() {}       // (about to be) removed from parent node
 
 		void set_script(std::shared_ptr<lua::Script> script);
 
@@ -48,9 +50,11 @@ namespace scrinks::core
 		void claim_child(Node& node);
 		void disown_child(Node& node);
 		void reload_script_if_outdated();
+		void setup_env_for_thread();
 
 	protected:
 		sol::environment m_script_env;
+		threads::Reference m_thread;
 
 	private:
 		Node* m_parent;

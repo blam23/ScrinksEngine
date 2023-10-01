@@ -11,10 +11,12 @@
 
 namespace scrinks::lua
 {
-	bool setup();
+	void setup();
 
 	sol::environment create_env();
 	sol::load_result load(const std::string& code, const std::string& file);
+	void dbg(sol::environment& env, const std::string& code);
+	void dbg_print_globals(sol::environment& env);
 	sol::state& state();
 }
 

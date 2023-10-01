@@ -3,19 +3,25 @@
 
 #include <memory>
 #include <typeinfo>
+#include <thread>
 #include "metadata_helpers.h"
 
 using namespace scrinks::core;
 
 std::atomic<Node::ID> Node::s_id{ 0 };
 
-Node::Node(Node* m_parent)
-	: m_parent{ m_parent }
-	, m_name{}
+Node::Node(Node* m_parent, threads::Group threadGroup)
+	: m_name{}
 	, m_script{ nullptr }
 	, m_id { s_id++ }
-	, m_script_env { lua::create_env() }
+	, m_thread{ threads::Reference{ threadGroup } }
 {
+	threads::dispatch_singular_and_wait(m_thread,
+		[&] ()
+		{
+			m_script_env = lua::create_env();
+		});
+
 	if (m_parent)
 		m_parent->claim_child(*this);
 }
@@ -46,15 +52,18 @@ void scrinks::core::Node::reserve_child_nodes(size_t amount)
 
 void Node::run_func_checked(const std::string& func)
 {
-	sol::function fixedUpdate = m_script_env[func];
-	if (fixedUpdate.valid())
+	if (m_script && m_script_env.valid())
 	{
-		sol::set_environment(m_script_env, fixedUpdate);
-		sol::function_result res{ fixedUpdate() };
-		if (!res.valid())
+		sol::function luaFunc = m_script_env[func];
+		if (luaFunc.valid())
 		{
-			sol::error msg = res;
-			std::cerr << "Error calling func <" << func << ">, error: " << msg.what() << std::endl;
+			sol::set_environment(m_script_env, luaFunc);
+			sol::function_result res{ luaFunc() };
+			if (!res.valid())
+			{
+				sol::error msg = res;
+					std::cerr << "Error calling func <" << func << ">, error: " << msg.what() << std::endl;
+			}
 		}
 	}
 }
@@ -72,14 +81,24 @@ void Node::reload_script_if_outdated()
 
 void Node::fixed_update()
 {
-	reload_script_if_outdated();
-
-	run_func_checked("fixed_update");
+	if (threads::on_my_thread(m_thread))
+		run_func_checked("fixed_update");
 
 	for (Node* child : m_children)
 	{
 		if (child)
 			child->fixed_update();
+	}
+}
+
+void scrinks::core::Node::check_resources()
+{
+	reload_script_if_outdated();
+
+	for (Node* child : m_children)
+	{
+		if (child)
+			child->check_resources();
 	}
 }
 
@@ -89,15 +108,20 @@ void Node::set_script(std::shared_ptr<lua::Script> script)
 
 	if (m_script)
 	{
-		auto res = m_script->run(m_script_env);
-		if (!res.valid())
-		{
-			sol::error err = res;
-			std::cerr << "Failed to set script: " << err.what() << std::endl;
-		}
+		threads::dispatch_singular_and_wait(m_thread,
+			[&] ()
+			{
+				m_script_env = lua::create_env();
+				auto res = m_script->run_no_cache(m_script_env);
+				if (!res.valid())
+				{
+					sol::error err = res;
+					std::cerr << "Failed to set script: " << err.what() << std::endl;
+				}
 
-		setup_script_data();
-		run_func_checked("script_added");
+				setup_script_data();
+				run_func_checked("script_added");
+			});
 	}
 }
 

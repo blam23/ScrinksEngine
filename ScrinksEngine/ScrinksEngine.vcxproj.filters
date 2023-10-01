@@ -149,6 +149,9 @@
     <ClCompile Include="node_model.cpp">
       <Filter>core\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="thread_pool.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -253,7 +256,7 @@
     <ClInclude Include="inspector_node3d.h">
       <Filter>editor\inspectors</Filter>
     </ClInclude>
-    <ClInclude Include="node_threads.h">
+    <ClInclude Include="thread_pool.h">
       <Filter>core\headers</Filter>
     </ClInclude>
   </ItemGroup>

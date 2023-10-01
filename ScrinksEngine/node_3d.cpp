@@ -29,8 +29,11 @@ void scrinks::core::Node3D::setup_script_data()
 
 void Node3D::fixed_update()
 {
-	m_previous = m_current;
-	Node::fixed_update();
+	if (threads::on_my_thread(m_thread))
+	{
+		m_previous = m_current;
+		Node::fixed_update();
+	}
 }
 
 void Node3D::set_position(const glm::vec3& pos)

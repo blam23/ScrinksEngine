@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "errors.h"
 #include "default_pipeline.h"
+#include "thread_pool.h"
 
 #include <iostream>
 #include <array>
@@ -128,15 +129,16 @@ bool Window::init(int width, int height, const std::string& name)
 
 void scrinks::Window::fixed_update()
 {
-    for (auto itr = s_fixedUpdateCallbacks.begin(); itr != s_fixedUpdateCallbacks.end(); itr++)
-    {
-        if (*itr)
-            (*itr)();
-        else
-            s_fixedUpdateCallbacks.erase(itr);
-    }
+    //for (auto itr = s_fixedUpdateCallbacks.begin(); itr != s_fixedUpdateCallbacks.end(); itr++)
+    //{
+    //    if (*itr)
+    //        (*itr)();
+    //    else
+    //        s_fixedUpdateCallbacks.erase(itr);
+    //}
 
-    core::Game::fixed_update();
+    //core::Game::fixed_update();
+    threads::dispatch_and_wait(&core::Game::fixed_update);
 }
 
 std::array<double,20> avg{ 0.0 };

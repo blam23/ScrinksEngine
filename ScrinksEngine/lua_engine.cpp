@@ -7,10 +7,12 @@
 
 using namespace scrinks::lua;
 
-static sol::state mainState;
-static scrinks::core::Node* currentNode{ nullptr };
+thread_local sol::state mainState;
+thread_local bool attemptedSetup;
 
-bool scrinks::lua::setup()
+scrinks::core::Node* currentNode{ nullptr };
+
+void scrinks::lua::setup()
 {
 	mainState.open_libraries
 	(
@@ -28,12 +30,19 @@ bool scrinks::lua::setup()
 		sol::error err = res;
 		std::cerr << "Failed to load init script: " << err.what() << std::endl;
 	}
+	else
+	{
+		std::cerr << "Loaded lua!" << std::endl;
+	}
 
-	return true;
+	attemptedSetup = true;
 }
 
 sol::environment scrinks::lua::create_env()
 {
+	if (!attemptedSetup)
+		setup();
+
 	return { mainState, sol::create, mainState["_G"].tbl };
 }
 
@@ -42,10 +51,13 @@ sol::load_result scrinks::lua::load(const std::string& code, const std::string& 
 	return mainState.load(code, file);
 }
 
-sol::state& scrinks::lua::state()
+void scrinks::lua::dbg(sol::environment& env, const std::string& code)
 {
-	return mainState;
+	mainState.script(code, env);
 }
 
-
+void scrinks::lua::dbg_print_globals(sol::environment& env)
+{
+	mainState.script("for k,v in pairs(_G) do print(k,v) end", env);
+}
 

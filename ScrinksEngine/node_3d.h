@@ -33,7 +33,10 @@ namespace scrinks::core
 		virtual void setup_script_data() override;
 
 	public:
-		glm::mat4 mat4(float interpolate) const { return glm::mix(m_previous.matrix(), m_current.matrix(), interpolate); }
+		glm::mat4 mat4(float interpolate) const 
+		{ 
+			return glm::mix(m_previous.matrix(), m_current.matrix(), interpolate);
+		}
 		glm::vec3& pos() { return m_current.pos; }
 		glm::quat& rot() { return m_current.rot; }
 		glm::vec3& scale() { return m_current.scale; }

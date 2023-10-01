@@ -7,6 +7,7 @@
 #include "gbuffer.h"
 #include "pipeline.h"
 #include "script.h"
+#include "game.h"
 #include "glm/glm.hpp"
 
 #pragma warning(push)
@@ -81,13 +82,20 @@ void debug()
             render::ShaderManager::instance().reload_all();
             render::ModelManager::instance().reload_all();
             lua::ScriptManager::instance().reload_all();
+            core::Game::check_resources();
         }
 
         if (ImGui::Button("Reload Shaders"))
+        {
             render::ShaderManager::instance().reload_all();
+            core::Game::check_resources();
+        }
 
         if (ImGui::Button("Reload Scripts"))
+        {
             lua::ScriptManager::instance().reload_all();
+            core::Game::check_resources();
+        }
 
         for (auto& [name, value] : debug::get_all_test_floats())
         {

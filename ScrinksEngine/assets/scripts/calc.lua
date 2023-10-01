@@ -1,5 +1,4 @@
-x = 1
+i = math.floor(math.random() * 100)
 function fixed_update()
-    -- do some stuff each frame
-    x = x + math.sin(x) - math.cos(x) * math.tan(x)
+    i = i + 1
 end

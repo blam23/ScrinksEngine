@@ -20,6 +20,7 @@ namespace scrinks::core
 	public:
 		static void init(std::unique_ptr<Node>&& root);
 		static void fixed_update();
+		static void check_resources();
 		static Node* root() { return s_root.get(); }
 
 	private:

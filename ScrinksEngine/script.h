@@ -19,9 +19,11 @@ namespace scrinks::lua
 
 	public:
 		sol::function_result run(sol::environment& env);
+		sol::function_result run_no_cache(sol::environment& env);
 
 	private:
 		sol::function m_code;
+		std::string m_strCode;
 	};
 }
 

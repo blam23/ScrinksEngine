@@ -15,6 +15,8 @@ namespace scrinks::core::nodes
 
 		void draw(std::shared_ptr<render::Shader>, float interpolate);
 		bool& visible() { return m_visible; }
+		bool visible() const { return m_visible; }
+		void set_visible(bool visible) { m_visible = visible; }
 
 	protected:
 		virtual const std::string_view default_name() const { return "Model"; }
