@@ -93,7 +93,7 @@ std::shared_ptr<Shader> ShaderManager::load(const std::string& name, const Shade
 
 		return std::make_shared<Shader>(Badge<ShaderManager>{}, name, vCode, fCode);
 	}
-	catch (std::ifstream::failure error)
+	catch (const std::ifstream::failure& error)
 	{
 		std::cerr << "Error loading shader <" << description.vertexPath << "," << description.fragmentPath << ">: '" << error.what() << "'." << std::endl;
 	}

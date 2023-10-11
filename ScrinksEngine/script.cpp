@@ -63,7 +63,7 @@ std::shared_ptr<Script> ScriptManager::load(const std::string& name, const Scrip
 		code = stream.str();
 		return std::make_shared<Script>(Badge<ScriptManager>{}, name, code);
 	}
-	catch (std::ifstream::failure error)
+	catch (const std::ifstream::failure& error)
 	{
 		std::cerr << "Error loading script <" << description << ">: '" << error.what() << "'." << std::endl;
 	}
