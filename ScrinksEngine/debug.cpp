@@ -2,6 +2,7 @@
 
 std::map<std::string, float> s_testFloats{};
 std::map<std::string, glm::vec3> s_testDirs{};
+std::map<std::string, glm::vec3> s_testColours{};
 
 std::map<std::string, float>& scrinks::debug::get_all_test_floats()
 {
@@ -11,6 +12,11 @@ std::map<std::string, float>& scrinks::debug::get_all_test_floats()
 std::map<std::string, glm::vec3>& scrinks::debug::get_all_test_dirs()
 {
     return s_testDirs;
+}
+
+std::map<std::string, glm::vec3>& scrinks::debug::get_all_test_colours()
+{
+    return s_testColours;
 }
 
 float scrinks::debug::get_test_float(const std::string& name, float defaultValue)
@@ -32,6 +38,18 @@ const glm::vec3& scrinks::debug::get_test_dir(const std::string& name)
     {
         s_testDirs[name] = glm::vec3(0.0f);
         return s_testDirs[name];
+    }
+
+    return idx->second;
+}
+
+const glm::vec3& scrinks::debug::get_test_colour(const std::string& name)
+{
+    auto idx = s_testColours.find(name);
+    if (idx == s_testColours.end())
+    {
+        s_testColours[name] = glm::vec3(1.0f);
+        return s_testColours[name];
     }
 
     return idx->second;

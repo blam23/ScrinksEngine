@@ -27,7 +27,8 @@ namespace scrinks::render
 		GLint width;
 		GLint height;
 	};
-	using BufferManager = core::AssetManager<BufferDescriptor, Buffer>;
+	using BufferManager = core::GenerativeAssetManager<BufferDescriptor, GLuint, Buffer>;
+	using InnerBufferAssetManager = core::AssetManager<BufferDescriptor, Buffer>;
 
 	class Buffer : public core::Asset
 	{
@@ -47,7 +48,8 @@ namespace scrinks::render
 		static void bind(GLenum slot, const std::string bufferName);
 
 	public:
-		Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor desc);
+		Buffer(Badge<InnerBufferAssetManager>, const std::string& name, BufferDescriptor desc);
+		Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor desc, GLuint bufferId);
 		~Buffer();
 
 		inline GLuint attachment() const { return m_attachment; }

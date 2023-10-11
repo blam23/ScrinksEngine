@@ -99,24 +99,36 @@ void debug()
             core::Game::check_resources();
         }
 
-        for (auto& [name, value] : debug::get_all_test_floats())
+        if (ImGui::CollapsingHeader("Floats"))
         {
-            ImGui::DragFloat(name.c_str(), &value);
-            ImGui::Spacing();
+            for (auto& [name, value] : debug::get_all_test_floats())
+            {
+                ImGui::DragFloat(name.c_str(), &value, 0.01f);
+                ImGui::Spacing();
+            }
         }
-        for (auto& [name, value] : debug::get_all_test_dirs())
+        
+        if (ImGui::CollapsingHeader("Directions"))
         {
-            ImGui::gizmo3D(name.c_str(), value);
-            ImGui::Spacing();
+            for (auto& [name, value] : debug::get_all_test_dirs())
+            {
+                ImGui::gizmo3D(name.c_str(), value);
+                ImGui::Spacing();
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Colours"))
+        {
+            for (auto& [name, value] : debug::get_all_test_colours())
+            {
+                float col[3]{ value.r, value.g, value.b };
+                ImGui::ColorEdit3(name.c_str(), col);
+                ImGui::Spacing();
+                value.r = col[0]; value.g = col[1]; value.b = col[2];
+            }
         }
     }
     ImGui::End();
-}
-
-render::pass::ShadowMap* shadowMap{ nullptr };
-void editor::add_shadow_map_tracker(render::pass::ShadowMap* m)
-{
-    shadowMap = m;
 }
 
 void assets()

@@ -11,4 +11,7 @@ namespace scrinks::debug
 
 	std::map<std::string, glm::vec3>& get_all_test_dirs();
 	const glm::vec3& get_test_dir(const std::string& name);
+
+	std::map<std::string, glm::vec3>& get_all_test_colours();
+	const glm::vec3& get_test_colour(const std::string& name);
 }

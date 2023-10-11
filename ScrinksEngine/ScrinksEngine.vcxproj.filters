@@ -152,6 +152,12 @@
     <ClCompile Include="thread_pool.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="pass_environment_map.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
+    <ClCompile Include="pass_sky_map.cpp">
+      <Filter>render\render_passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -258,6 +264,12 @@
     </ClInclude>
     <ClInclude Include="thread_pool.h">
       <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_environment_map.h">
+      <Filter>render\render_passes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pass_sky_map.h">
+      <Filter>render\render_passes\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

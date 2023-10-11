@@ -28,7 +28,7 @@ void Buffer::bind(GLenum slot, const std::string bufferName)
 	glBindTexture(GL_TEXTURE_2D, buffer->id());
 }
 
-Buffer::Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor descriptor)
+Buffer::Buffer(Badge<InnerBufferAssetManager>, const std::string& name, BufferDescriptor descriptor)
 	: m_attachment{ descriptor.attachment }
 	, m_width{ descriptor.width }
 	, m_height{ descriptor.height }
@@ -42,6 +42,16 @@ Buffer::Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor d
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	m_loaded = true;
+}
+
+Buffer::Buffer(Badge<BufferManager>, const std::string& name, BufferDescriptor descriptor, GLuint existingId)
+	: m_attachment{ descriptor.attachment }
+	, m_width{ descriptor.width }
+	, m_height{ descriptor.height }
+	, Asset{ name, 0 }
+{
+	m_id = existingId;
 	m_loaded = true;
 }
 
@@ -62,10 +72,17 @@ void bind(const std::shared_ptr<Buffer>& buffer)
 }
 
 template <>
-std::shared_ptr<Buffer> BufferManager::load(const std::string& name, const BufferDescriptor& description)
+std::shared_ptr<Buffer> InnerBufferAssetManager::load(const std::string& name, const BufferDescriptor& description)
 {
-	return std::make_shared<Buffer>(Badge<BufferManager>{}, name, description);
+	return std::make_shared<Buffer>(Badge<InnerBufferAssetManager>{}, name, description);
 }
+
+template <>
+std::shared_ptr<Buffer> BufferManager::from_raw(const std::string& name, GLuint raw, const BufferDescriptor& desc)
+{
+	return std::make_shared<Buffer>(Badge<BufferManager>{}, name, desc, raw);
+}
+
 
 void GBuffer::setup_buffers()
 {
@@ -105,7 +122,8 @@ GBuffer::GBuffer(GLsizei width, GLsizei height)
 {
 	add_buffer("position",  BufferFormat::rgb16f);
 	add_buffer("normal",    BufferFormat::rgb16f);
-	add_buffer("albedo",    BufferFormat::rgba);
+	add_buffer("albedo",    BufferFormat::rgb);
+	add_buffer("mrao",      BufferFormat::rgba);  // metallic, roughness & ao map
 	add_buffer("depth", BufferFormat::depth, GL_DEPTH_ATTACHMENT);
 
 	glGenFramebuffers(1, &m_id);

@@ -1,4 +1,5 @@
 #include "pass_geometry.h"
+#include "debug.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4201)
@@ -22,6 +23,7 @@ void Geometry::init()
         "deferred_render",
         { "assets/shaders/render_single.vs", "assets/shaders/render_single.fs" }
     );
+    assert(m_shader);
 }
 
 void Geometry::draw(float interpolate)
@@ -44,6 +46,7 @@ void Geometry::draw(float interpolate)
 
     m_shader->set_param<const glm::mat4&>("view", Pipeline::camera().view());
     m_shader->set_param<const glm::mat4&>("projection", Pipeline::projection());
+    m_shader->set_param("tint", debug::get_test_colour("tint"));
 
     render::Drawable<core::nodes::DynamicModel>::draw_list(m_shader, interpolate);
 

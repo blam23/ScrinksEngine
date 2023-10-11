@@ -21,6 +21,9 @@ void scrinks::core::Node3D::setup_script_data()
 	m_script_env["rotate"]
 		= [this] (float a, float x, float y, float z) { return rotate(a, glm::vec3{ x, y, z }); };
 
+	m_script_env["set_rotation"]
+		= [this] (float x, float y, float z) { return set_rotation(glm::vec3{ x, y, z }); };
+
 	m_script_env["set_scale"]
 		= [this] (float x, float y, float z) { return set_scale(x, y, z); };
 
@@ -73,3 +76,10 @@ void Node3D::set_rotation(glm::quat& q)
 {
 	m_current.rot = q;
 }
+
+void Node3D::set_rotation(const glm::vec3& rot)
+{
+	m_current.rot = glm::quatLookAt(rot, glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+

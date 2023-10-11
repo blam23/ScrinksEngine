@@ -34,7 +34,10 @@ struct AssignableThread
 		{
 			{
 				std::unique_lock<std::mutex> waitLock { m_waitMutex };
-				m_added.wait(waitLock, [&] () { return m_func; });
+				m_added.wait(waitLock, [&] () { return m_func || exit_all_threads; });
+
+				if (exit_all_threads)
+					return;
 
 				for (auto node : s_threadNodes[m_index])
 				{
@@ -55,6 +58,12 @@ struct AssignableThread
 		std::lock_guard<std::mutex> waitLock { m_waitMutex };
 		m_taskComplete = false;
 		m_func = func;
+		m_added.notify_all();
+	}
+
+	void shutdown()
+	{
+		std::lock_guard<std::mutex> waitLock { m_waitMutex };
 		m_added.notify_all();
 	}
 
@@ -79,11 +88,19 @@ std::vector<std::unique_ptr<AssignableThread>> s_threads{};
 
 void threads::register_node(Reference& thread, void* node)
 {
+	// don't bother adding stuff if we're shutting down.
+	if (exit_all_threads)
+		return;
+
 	s_threadNodes[thread.m_thread_id].push_front(node);
 }
 
 void threads::unregister_node(Reference& thread, void* node)
 {
+	// don't bother removing stuff if we're shutting down.
+	if (exit_all_threads)
+		return;
+
 	s_threadNodes[thread.m_thread_id].remove(node);
 }
 
@@ -134,6 +151,9 @@ void threads::setup()
 void threads::shutdown()
 {
 	exit_all_threads = true;
+
+	for (auto& thread : s_threads)
+		thread->shutdown();
 
 	for (auto& thread : s_threads)
 		thread->m_thread.join();

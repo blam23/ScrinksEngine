@@ -48,9 +48,8 @@ namespace scrinks::core
 	public:
 		static AssetManager& instance();
 
-	private:
+	protected:
 		std::shared_ptr<T_Asset> load(const std::string& name, const T_Descriptor& description);
-
 		std::map<std::string, std::pair<T_Descriptor, std::shared_ptr<T_Asset>>> m_store{};
 
 	protected:
@@ -75,9 +74,7 @@ namespace scrinks::core
 			const auto [idx, success] = m_store.try_emplace(name, std::pair(description, asset));
 
 			if (success)
-			{
 				return idx->second.second;
-			}
 		}
 
 		return nullptr;
@@ -162,6 +159,47 @@ namespace scrinks::core
 	AssetManager<T_Descriptor, T_Asset>& AssetManager<T_Descriptor, T_Asset>::instance()
 	{
 		static AssetManager<T_Descriptor, T_Asset> s_instance;
+		return s_instance;
+	}
+
+	template <typename T_Descriptor, typename T_RawAsset, typename T_Asset>
+	class GenerativeAssetManager : public AssetManager<T_Descriptor, T_Asset>
+	{
+	public:
+		std::shared_ptr<T_Asset> store(const std::string& name, const T_Descriptor& description, T_RawAsset rawAsset);
+
+	public:
+		static GenerativeAssetManager& instance();
+
+	private:
+		std::shared_ptr<T_Asset> from_raw(const std::string& name, T_RawAsset raw, const T_Descriptor& description);
+	};
+
+	template<typename T_Descriptor, typename T_RawAsset, typename T_Asset>
+	std::shared_ptr<T_Asset> GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset>
+		::store(const std::string& name, const T_Descriptor& description, T_RawAsset raw)
+	{
+		const auto itr{ AssetManager<T_Descriptor, T_Asset>::m_store.find(name) };
+		if (itr != AssetManager<T_Descriptor, T_Asset>::m_store.end())
+			return itr->second.second;
+
+		std::shared_ptr<T_Asset> asset{ from_raw(name, raw, description) };
+
+		if (asset && asset->is_loaded())
+		{
+			const auto [idx, success] = AssetManager<T_Descriptor, T_Asset>::m_store.try_emplace(name, std::pair(description, asset));
+
+			if (success)
+				return idx->second.second;
+		}
+
+		return nullptr;
+	}
+
+	template<typename T_Descriptor, typename T_RawAsset, typename T_Asset>
+	GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset>& GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset>::instance()
+	{
+		static GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset> s_instance;
 		return s_instance;
 	}
 }

@@ -80,8 +80,13 @@ void convert_mesh(std::vector<Mesh>& meshes, aiMesh* mesh, const aiScene* scene,
 	{
 		aiMaterial* mat{ scene->mMaterials[mesh->mMaterialIndex] };
 		load_textures_from_material(textures, mat, aiTextureType_DIFFUSE, relativePath);
-		load_textures_from_material(textures, mat, aiTextureType_SPECULAR, relativePath);
+		load_textures_from_material(textures, mat, aiTextureType_METALNESS, relativePath);
+		load_textures_from_material(textures, mat, aiTextureType_DIFFUSE_ROUGHNESS, relativePath);
+		load_textures_from_material(textures, mat, aiTextureType_AMBIENT_OCCLUSION, relativePath);
 	}
+
+	if (textures.size() == 0)
+		textures.push_back(TextureManager::instance().load_and_store("1x1", "assets/textures/1x1.png"));
 
 	meshes.emplace_back(std::move(vertices), std::move(indices), std::move(textures));
 }

@@ -10,7 +10,7 @@
 
 using namespace scrinks;
 
-bool drawDebug{ false };
+bool drawDebug{ true };
 bool dbgKeyReleased{ false };
 
 bool viewportFocused{ false };

@@ -10,6 +10,8 @@ uniform sampler2D gDepth;
 uniform sampler2D ssao;
 uniform sampler2D shadowMap;
 
+uniform samplerCube skyMap;
+
 struct Light {
     vec3 Position;
     vec3 Colour;
@@ -104,6 +106,6 @@ void main()
     colour += vec3((worldPos.y - 10) / 30);
     colour *= lighting * albedo;
 
-    if (depth > 0.999)
-       colour = vec3(0.1, 0.1, 0.3);
+    //if (depth > 0.999)
+    colour = texture(skyMap, viewPos).rgb;
 }

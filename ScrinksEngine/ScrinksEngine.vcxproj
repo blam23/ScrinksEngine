@@ -162,6 +162,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="node.cpp" />
     <ClCompile Include="node_model.cpp" />
+    <ClCompile Include="pass_environment_map.cpp" />
+    <ClCompile Include="pass_sky_map.cpp" />
     <ClCompile Include="thread_pool.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="node_3d.cpp" />
@@ -196,6 +198,8 @@
     <ClInclude Include="metadata_helpers.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="node_model.h" />
+    <ClInclude Include="pass_environment_map.h" />
+    <ClInclude Include="pass_sky_map.h" />
     <ClInclude Include="thread_pool.h" />
     <ClInclude Include="script.h" />
     <ClInclude Include="node_3d.h" />

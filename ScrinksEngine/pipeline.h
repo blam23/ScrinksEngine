@@ -21,6 +21,7 @@ namespace scrinks::render
 		static void resize_if_needed(GLsizei width, GLsizei height);
 		static void force_recreate();
 		static void fullscreen_quad();
+		static void unit_cube();
 
 		template <typename T_Pass>
 		static T_Pass* register_pass();
@@ -69,4 +70,20 @@ namespace scrinks::render
 		size_t index{ s_passes.size() - 1 };
 		return (T_Pass*)s_passes[index].get();
 	}
+
+	struct AutoResetDepthFunc
+	{
+	public:
+		DISABLE_COPY_AND_MOVE(AutoResetDepthFunc);
+
+		AutoResetDepthFunc(GLenum depthFunc)
+		{
+			glDepthFunc(depthFunc);
+		}
+
+		~AutoResetDepthFunc()
+		{
+			glDepthFunc(GL_GEQUAL); // default
+		}
+	};
 }

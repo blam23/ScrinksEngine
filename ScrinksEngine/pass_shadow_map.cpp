@@ -25,6 +25,7 @@ ShadowMap* ShadowMap::init(GLsizei size)
         "shadow_map",
         { "assets/shaders/shadow_depth.vs", "assets/shaders/empty.fs" }
     );
+    assert(m_shader);
 
 	m_target = std::make_unique<render::RenderTarget>("shadow_map", BufferFormat::depth, size, size, GL_DEPTH_ATTACHMENT);
 
@@ -63,13 +64,6 @@ void ShadowMap::tag_outdated()
     m_outdated = true;
 }
 
-#include "editor_debug.h"
-ShadowMap* ShadowMap::send_to_debug_ui()
-{
-    editor::add_shadow_map_tracker(this);
-    return this;
-}
-
 void ShadowMap::draw(float interpolate)
 {
     if (!m_outdated)
@@ -101,5 +95,5 @@ void ShadowMap::draw(float interpolate)
 
 void ShadowMap::resize(GLsizei, GLsizei)
 {
-	// no need to resize anything.
+	// no need to resize anything, this is for when the window resizes.
 }

@@ -19,6 +19,7 @@ void PostProcessing::load_assets()
         "post_process",
         { "assets/shaders/empty_to_quad.vs", "assets/shaders/pp.fs" }
     );
+    assert(m_shader);
 }
 
 void PostProcessing::setup_draw()

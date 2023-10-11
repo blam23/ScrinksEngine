@@ -57,6 +57,7 @@ void SSAO::load_assets()
 	m_shader = render::ShaderManager::instance().load_and_store(
 		"ssao", { "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao.fs" }
 	);
+	assert(m_shader);
 
 	send_data_to_shader();
 }

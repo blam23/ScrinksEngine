@@ -51,6 +51,7 @@ namespace scrinks::core
 		void set_scale(float amount);
 		void set_scale(float x, float y, float z);
 		void set_rotation(glm::quat&);
+		void set_rotation(const glm::vec3& rot);
 
 	private:
 		Transform m_current;

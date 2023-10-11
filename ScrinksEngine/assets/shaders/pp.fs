@@ -74,7 +74,7 @@ void main()
     float depth  = texture(depth, texCoord).r;
     vec3  sample = fxaa(size); // texture2D(lit,texCoord).xyz; //
 
-    sample = tone_map(sample, 1.5, 3);
+    sample = tone_map(sample, 1, 1);
 
     colour = sample;
 }

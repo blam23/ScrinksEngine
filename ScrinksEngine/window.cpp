@@ -56,6 +56,15 @@ bool Window::setup_imgui()
     return true;
 }
 
+void print_gl_data()
+{
+    int major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+    std::cout << "Running OpenGL " << major << "." << minor << " (" << glGetString(GL_VENDOR) << ")" << std::endl;
+}
+
 bool Window::setup_glfw(int width, int height, const std::string& name)
 {
     glfwSetErrorCallback(errors::glfw_error_callback);
@@ -66,7 +75,7 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
         return false;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -82,11 +91,13 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
         return false;
     }
 
-    if (!gl3wIsSupported(3, 2))
+    if (!gl3wIsSupported(4, 3))
     {
-        std::cerr << "Required OpenGL version 3.2 is not supported on this platform." << std::endl;
+        std::cerr << "Required OpenGL version 4.3 is not supported on this platform." << std::endl;
         return false;
     }
+
+    print_gl_data();
 
     glfwSetWindowSizeCallback(s_window, window_size_callback);
 
@@ -192,6 +203,8 @@ void scrinks::Window::run_loop()
 
 void scrinks::Window::shutdown()
 {
+    threads::shutdown();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
