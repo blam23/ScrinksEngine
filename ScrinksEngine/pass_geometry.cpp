@@ -18,7 +18,7 @@ Geometry::~Geometry()
 
 void Geometry::init()
 {
-    m_shader = render::ShaderManager::instance().load_and_store
+    m_shader = render::ShaderManager::load_and_store
     (
         "deferred_render",
         { "assets/shaders/render_single.vs", "assets/shaders/render_single.fs" }
@@ -39,7 +39,7 @@ void Geometry::draw(float interpolate)
     if (m_shader)
     {
         if (m_shader->is_outdated())
-            m_shader = render::ShaderManager::instance().get("deferred_render");
+            m_shader = render::ShaderManager::get("deferred_render");
 
         m_shader->use_program();
     }

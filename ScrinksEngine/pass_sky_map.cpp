@@ -13,7 +13,7 @@ SkyMap::~SkyMap()
 
 void SkyMap::init()
 {
-    m_shader = render::ShaderManager::instance().load_and_store
+    m_shader = render::ShaderManager::load_and_store
     (
         "sky_map",
         { "assets/shaders/sky_map.vs", "assets/shaders/sky_map.fs" }
@@ -25,7 +25,7 @@ void SkyMap::init()
 void SkyMap::draw(float /*interpolate*/)
 {
     if (!m_shader || m_shader->is_outdated())
-        m_shader = render::ShaderManager::instance().get("sky_map");
+        m_shader = render::ShaderManager::get("sky_map");
 
     Pipeline::gbuffer()->bind_write();
     {

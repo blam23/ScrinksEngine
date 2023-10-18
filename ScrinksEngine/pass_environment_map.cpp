@@ -21,14 +21,14 @@ EnvironmentMap* EnvironmentMap::init(GLsizei size)
 {
     m_size = size;
 
-    m_shader = render::ShaderManager::instance().load_and_store
+    m_shader = render::ShaderManager::load_and_store
     (
         "cubemap",
         { "assets/shaders/cubemap/render.vs", "assets/shaders/cubemap/render.fs" }
     );
     assert(m_shader);
 
-    m_texture = render::TextureManager::instance().load_and_store
+    m_texture = render::TextureManager::load_and_store
     (
         "env_map",
         { "assets/hdr/spiaggia_di_mondello_4k.hdr", render::TextureType::HDR }
@@ -57,7 +57,7 @@ EnvironmentMap* EnvironmentMap::init(GLsizei size)
     for (GLuint i = 0; i < 6; ++i)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
 
-    render::BufferManager::instance().store("cube_map", {}, m_cubeMap);
+    render::BufferManager::store("cube_map", {}, m_cubeMap);
 
     return this;
 }

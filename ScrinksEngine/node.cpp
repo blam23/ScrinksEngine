@@ -66,7 +66,7 @@ void Node::reload_script_if_outdated()
 {
 	if (m_script && m_script->is_outdated())
 	{
-		auto newScript{ scrinks::lua::ScriptManager::instance().get(m_script->asset_name()) };
+		auto newScript{ scrinks::lua::ScriptManager::get(m_script->asset_name()) };
 
 		if (newScript)
 			set_script(newScript);

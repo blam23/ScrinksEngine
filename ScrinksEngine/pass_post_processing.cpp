@@ -14,7 +14,7 @@ PostProcessing::~PostProcessing()
 
 void PostProcessing::load_assets()
 {
-    m_shader = render::ShaderManager::instance().load_and_store
+    m_shader = render::ShaderManager::load_and_store
     (
         "post_process",
         { "assets/shaders/empty_to_quad.vs", "assets/shaders/pp.fs" }
@@ -25,7 +25,7 @@ void PostProcessing::load_assets()
 void PostProcessing::setup_draw()
 {
     if (!m_shader || m_shader->is_outdated())
-        m_shader = render::ShaderManager::instance().get("post_process");
+        m_shader = render::ShaderManager::get("post_process");
 
     m_shader->use_program();
 

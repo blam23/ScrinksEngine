@@ -19,7 +19,7 @@ namespace scrinks::editor
         void refresh()
         {
             std::vector<std::string>::clear();
-            T_Manager::instance().for_each_name
+            T_Manager::for_each_name
             (
                 [&] (const std::string name) -> void
                 {

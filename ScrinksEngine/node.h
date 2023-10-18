@@ -34,6 +34,12 @@ namespace scrinks::core
 		// If you're gonna add a shit tonne of child nodes..
 		void reserve_child_nodes(size_t amount);
 
+		template <typename T_Node, class... T_Args>
+		T_Node* new_child(T_Args... args)
+		{
+			return new T_Node(this, args...);
+		}
+
 		//
 		// EVENTS
 		//

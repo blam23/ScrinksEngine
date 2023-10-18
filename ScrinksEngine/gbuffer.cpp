@@ -16,7 +16,7 @@ std::map<BufferFormat, Buffer::Metadata> s_data{
 
 void Buffer::bind(GLenum slot, const std::string bufferName)
 {
-	const auto buffer{ BufferManager::instance().get(bufferName) };
+	const auto buffer{ BufferManager::get(bufferName) };
 
 	if (!buffer)
 	{
@@ -112,7 +112,7 @@ void GBuffer::add_buffer(const std::string& name, BufferFormat format, GLuint at
 			: attachment
 	};
 
-	m_buffers.push_back(BufferManager::instance().reload_and_store(name, { format, calcAttachment, m_width, m_height }));
+	m_buffers.push_back(BufferManager::reload_and_store(name, { format, calcAttachment, m_width, m_height }));
 }
 
 GBuffer::GBuffer(GLsizei width, GLsizei height)

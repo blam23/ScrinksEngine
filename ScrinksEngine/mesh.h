@@ -12,7 +12,6 @@
 namespace scrinks::render
 {
 	class Mesh;
-	using MeshDescription = std::string;
 	using TextureVector = std::vector<std::shared_ptr<Texture>>;
 
 	struct Vertex

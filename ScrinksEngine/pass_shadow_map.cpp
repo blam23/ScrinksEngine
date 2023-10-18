@@ -20,7 +20,7 @@ ShadowMap* ShadowMap::init(GLsizei size)
 {
     m_size = size;
 
-    m_shader = render::ShaderManager::instance().load_and_store
+    m_shader = render::ShaderManager::load_and_store
     (
         "shadow_map",
         { "assets/shaders/shadow_depth.vs", "assets/shaders/empty.fs" }

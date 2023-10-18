@@ -80,22 +80,22 @@ void debug()
 
         if(ImGui::Button("Reload All"))
         {
-            render::TextureManager::instance().reload_all();
-            render::ShaderManager::instance().reload_all();
-            render::ModelManager::instance().reload_all();
-            lua::ScriptManager::instance().reload_all();
+            render::TextureManager::reload_all();
+            render::ShaderManager::reload_all();
+            render::ModelManager::reload_all();
+            lua::ScriptManager::reload_all();
             core::Game::check_resources();
         }
 
         if (ImGui::Button("Reload Shaders"))
         {
-            render::ShaderManager::instance().reload_all();
+            render::ShaderManager::reload_all();
             core::Game::check_resources();
         }
 
         if (ImGui::Button("Reload Scripts"))
         {
-            lua::ScriptManager::instance().reload_all();
+            lua::ScriptManager::reload_all();
             core::Game::check_resources();
         }
 
@@ -149,7 +149,7 @@ void assets()
                 {
                     if (ImGui::Selectable(name.c_str(), n == chosen))
                     {
-                        displayTexture = render::TextureManager::instance().get(name);
+                        displayTexture = render::TextureManager::get(name);
                         chosen = n;
                     }
                     n++;
@@ -183,7 +183,7 @@ void assets()
                 {
                     if (ImGui::Selectable(name.c_str(), n == chosen))
                     {
-                        displayBuffer = render::BufferManager::instance().get(name);
+                        displayBuffer = render::BufferManager::get(name);
                         chosen = n;
                     }
                     n++;

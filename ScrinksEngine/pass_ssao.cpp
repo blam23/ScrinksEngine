@@ -54,7 +54,7 @@ void SSAO::load_assets()
 
 	generate_noise_texture();
 
-	m_shader = render::ShaderManager::instance().load_and_store(
+	m_shader = render::ShaderManager::load_and_store(
 		"ssao", { "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao.fs" }
 	);
 	assert(m_shader);
@@ -75,7 +75,7 @@ void SSAO::send_data_to_shader()
 void SSAO::setup_draw()
 {
 	if (!m_shader || m_shader->is_outdated())
-		m_shader = render::ShaderManager::instance().get("ssao");
+		m_shader = render::ShaderManager::get("ssao");
 
 	m_shader->use_program();
 	m_shader->set_param("screenWidth", Pipeline::view_width());
@@ -137,7 +137,7 @@ SSAOBlur::~SSAOBlur()
 
 void SSAOBlur::load_assets()
 {
-	m_shader = render::ShaderManager::instance().load_and_store
+	m_shader = render::ShaderManager::load_and_store
 	(
 		"ssao_blur",
 		{ "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao_blur.fs" }
@@ -147,7 +147,7 @@ void SSAOBlur::load_assets()
 void SSAOBlur::setup_draw()
 {
 	if (!m_shader || m_shader->is_outdated())
-		m_shader = render::ShaderManager::instance().get("ssao_blur");
+		m_shader = render::ShaderManager::get("ssao_blur");
 
 	m_shader->use_program();
 	Buffer::bind(GL_TEXTURE0, "ssao_raw");

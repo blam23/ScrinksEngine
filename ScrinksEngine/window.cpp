@@ -204,6 +204,7 @@ void scrinks::Window::run_loop()
 void scrinks::Window::shutdown()
 {
     threads::shutdown();
+    scrinks::core::Game::shutdown();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

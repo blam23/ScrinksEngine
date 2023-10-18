@@ -34,9 +34,6 @@ namespace scrinks::render
 		}
 
 	private:
-		static std::vector<T*> drawList;
+		static inline std::vector<T*> drawList{};
 	};
-
-	template <class T>
-	std::vector<T*> Drawable<T>::drawList{};
 }

@@ -27,7 +27,7 @@ namespace scrinks::render
 		GLint width;
 		GLint height;
 	};
-	using BufferManager = core::GenerativeAssetManager<BufferDescriptor, GLuint, Buffer>;
+	using BufferManager = core::GeneratedAssetManager<BufferDescriptor, GLuint, Buffer>;
 	using InnerBufferAssetManager = core::AssetManager<BufferDescriptor, Buffer>;
 
 	class Buffer : public core::Asset

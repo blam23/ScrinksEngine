@@ -37,7 +37,7 @@ void load_textures_from_material
 		mat->GetTexture(type, i, &str);
 
 		const auto& fullPath{ relativePath + "/" + str.C_Str() };
-		auto texture{ TextureManager::instance().load_and_store(fullPath, fullPath) };
+		auto texture{ TextureManager::load_and_store(fullPath, fullPath) };
 
 		if (texture)
 			textures.push_back(texture);
@@ -86,7 +86,7 @@ void convert_mesh(std::vector<Mesh>& meshes, aiMesh* mesh, const aiScene* scene,
 	}
 
 	if (textures.size() == 0)
-		textures.push_back(TextureManager::instance().load_and_store("1x1", "assets/textures/1x1.png"));
+		textures.push_back(TextureManager::load_and_store("1x1", "assets/textures/1x1.png"));
 
 	meshes.emplace_back(std::move(vertices), std::move(indices), std::move(textures));
 }

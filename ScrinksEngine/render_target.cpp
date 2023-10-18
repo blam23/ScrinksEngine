@@ -6,7 +6,7 @@ using namespace scrinks::render;
 
 scrinks::render::RenderTarget::RenderTarget(const std::string name, BufferFormat format, GLint width, GLint height, GLenum attachment)
 {
-	m_buffer = BufferManager::instance().reload_and_store(name, { format, attachment, width, height });
+	m_buffer = BufferManager::reload_and_store(name, { format, attachment, width, height });
 
 	glGenFramebuffers(1, &m_bufID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_bufID);

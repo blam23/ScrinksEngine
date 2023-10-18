@@ -15,7 +15,7 @@ DeferredLighting::~DeferredLighting()
 
 void DeferredLighting::load_assets()
 {
-    m_shader = render::ShaderManager::instance().load_and_store
+    m_shader = render::ShaderManager::load_and_store
     (
         "deferred_lighting_pass",
         //{ "assets/shaders/empty_to_quad.vs", "assets/shaders/lighting_pass.fs" }
@@ -40,7 +40,7 @@ glm::vec3 lightColors[] {
 void DeferredLighting::setup_draw()
 {
     if (!m_shader || m_shader->is_outdated())
-        m_shader = render::ShaderManager::instance().get("deferred_lighting_pass");
+        m_shader = render::ShaderManager::get("deferred_lighting_pass");
 
     m_shader->use_program();
 

@@ -8,6 +8,9 @@
 
 namespace scrinks::core
 {
+	/// <summary>
+	/// A base-class for loadable/generatable assets, such as Scripts or Shaders.
+	/// </summary>
 	class Asset
 	{
 	public:
@@ -29,31 +32,27 @@ namespace scrinks::core
 		const std::string m_name;
 	};
 
+	/// <summary>
+	/// For managing loadable assets such as shaders, scripts and models
+	/// </summary>
+	/// <typeparam name="T_Descriptor">Data needed to load the asset, such as paths to the vertex and fragment shaders</typeparam>
+	/// <typeparam name="T_Asset">The type of asset to be managed, such as Shader or Model</typeparam>
 	template <typename T_Descriptor, typename T_Asset>
 	class AssetManager
 	{
 	public:
-		DISABLE_COPY_AND_MOVE(AssetManager);
-
-	public:
-		std::shared_ptr<T_Asset> load_and_store(const std::string& name, const T_Descriptor& description);
-		std::shared_ptr<T_Asset> reload_and_store(const std::string& name, const T_Descriptor& description);
-		std::shared_ptr<T_Asset> reload(const std::string& name);
-		std::shared_ptr<T_Asset> get(const std::string& name);
-		void mark_for_removal(const std::string& name);
-		void reload_all();
-		void for_each(std::function<void(const std::string& name, std::shared_ptr<T_Asset>)> func);
-		void for_each_name(std::function<void(const std::string& name)> func);
-
-	public:
-		static AssetManager& instance();
+		static std::shared_ptr<T_Asset> load_and_store(const std::string& name, const T_Descriptor& description);
+		static std::shared_ptr<T_Asset> reload_and_store(const std::string& name, const T_Descriptor& description);
+		static std::shared_ptr<T_Asset> reload(const std::string& name);
+		static std::shared_ptr<T_Asset> get(const std::string& name);
+		static void mark_for_removal(const std::string& name);
+		static void reload_all();
+		static void for_each(std::function<void(const std::string& name, std::shared_ptr<T_Asset>)> func);
+		static void for_each_name(std::function<void(const std::string& name)> func);
 
 	protected:
-		std::shared_ptr<T_Asset> load(const std::string& name, const T_Descriptor& description);
-		std::map<std::string, std::pair<T_Descriptor, std::shared_ptr<T_Asset>>> m_store{};
-
-	protected:
-		AssetManager() = default;
+		static std::shared_ptr<T_Asset> load(const std::string& name, const T_Descriptor& description);
+		static inline std::map<std::string, std::pair<T_Descriptor, std::shared_ptr<T_Asset>>> m_store{};
 	};
 
 	template<typename T_Descriptor, typename T_Asset>
@@ -62,13 +61,15 @@ namespace scrinks::core
 		const T_Descriptor& description
 	)
 	{
+		// If the asset already is loaded, return it
 		const auto itr{ m_store.find(name) };
 		if (itr != m_store.end())
 			return itr->second.second;
 
+		// Try and load the asset
 		const auto asset{ load(name, description) };
 
-		// Only replace if the asset is actually loaded
+		// Only emplace if the asset was loaded successfully
 		if (asset && asset->is_loaded())
 		{
 			const auto [idx, success] = m_store.try_emplace(name, std::pair(description, asset));
@@ -155,28 +156,24 @@ namespace scrinks::core
 		}
 	}
 
-	template<typename T_Descriptor, typename T_Asset>
-	AssetManager<T_Descriptor, T_Asset>& AssetManager<T_Descriptor, T_Asset>::instance()
-	{
-		static AssetManager<T_Descriptor, T_Asset> s_instance;
-		return s_instance;
-	}
-
+	/// <summary>
+	/// For managing generated assets that you want to be sharable by name, such as buffers
+	/// </summary>
+	/// <typeparam name="T_Descriptor">Data needed to create/recreate the asset, such as buffer size and format.</typeparam>
+	/// <typeparam name="T_RawAsset">The raw asset identifier, for example the GLuint of the VBO</typeparam>
+	/// <typeparam name="T_Asset">The type of asset to be managed</typeparam>
 	template <typename T_Descriptor, typename T_RawAsset, typename T_Asset>
-	class GenerativeAssetManager : public AssetManager<T_Descriptor, T_Asset>
+	class GeneratedAssetManager : public AssetManager<T_Descriptor, T_Asset>
 	{
 	public:
-		std::shared_ptr<T_Asset> store(const std::string& name, const T_Descriptor& description, T_RawAsset rawAsset);
-
-	public:
-		static GenerativeAssetManager& instance();
+		static std::shared_ptr<T_Asset> store(const std::string& name, const T_Descriptor& description, T_RawAsset rawAsset);
 
 	private:
-		std::shared_ptr<T_Asset> from_raw(const std::string& name, T_RawAsset raw, const T_Descriptor& description);
+		static std::shared_ptr<T_Asset> from_raw(const std::string& name, T_RawAsset raw, const T_Descriptor& description);
 	};
 
 	template<typename T_Descriptor, typename T_RawAsset, typename T_Asset>
-	std::shared_ptr<T_Asset> GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset>
+	std::shared_ptr<T_Asset> GeneratedAssetManager<T_Descriptor, T_RawAsset, T_Asset>
 		::store(const std::string& name, const T_Descriptor& description, T_RawAsset raw)
 	{
 		const auto itr{ AssetManager<T_Descriptor, T_Asset>::m_store.find(name) };
@@ -194,13 +191,6 @@ namespace scrinks::core
 		}
 
 		return nullptr;
-	}
-
-	template<typename T_Descriptor, typename T_RawAsset, typename T_Asset>
-	GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset>& GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset>::instance()
-	{
-		static GenerativeAssetManager<T_Descriptor, T_RawAsset, T_Asset> s_instance;
-		return s_instance;
 	}
 }
 

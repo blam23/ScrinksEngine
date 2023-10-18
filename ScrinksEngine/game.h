@@ -22,6 +22,7 @@ namespace scrinks::core
 		static void sync_fixed_update();
 		static void check_resources();
 		static Node* root() { return s_root.get(); }
+		static void shutdown();
 
 	private:
 		Game() = default;
