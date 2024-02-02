@@ -1,7 +1,9 @@
 #pragma once
 
+#include "node_2d.h"
 #include "node_3d.h"
 #include "node_model.h"
+#include "node_sprite.h"
 #include "editor_scene_tree.h"
 
 #pragma warning(push)
@@ -45,5 +47,28 @@ namespace scrinks::editor
 
 		return "Node3D";
 	}
+
+	std::string node_2d_inspector(core::Node* in)
+	{
+		core::Node2D* node{ (core::Node2D*)in };
+
+		ImGui::Text("Position"); ImGui::SameLine(100);
+		ImGui::SliderFloat2("##pos", glm::value_ptr(node->pos()), -5.f, 5.f);
+
+		ImGui::Text("Rot"); ImGui::SameLine(100);
+		ImGui::SliderFloat("##rot", node->rot_ptr(), -glm::half_pi<float>(), glm::half_pi<float>());
+
+		return "Node";
+	}
+
+	std::string node_sprite_inspector(core::Node* in)
+	{
+		core::nodes::Sprite* node{ (core::nodes::Sprite*)in };
+
+		ImGui::SliderFloat("Tile Idx", node->tile_index_ptr(), 0, 1024, "%.0f");
+
+		return "Node2D";
+	}
+
 }
 

@@ -1,8 +1,8 @@
 #version 330 core
 out vec3 colour;
-  
+
 in vec2 texCoord;
-  
+
 uniform sampler2D lit;
 uniform sampler2D depth;
 
@@ -61,9 +61,9 @@ vec3 tone_map(vec3 hdr, float gamma, float exposure)
 {
     // reinhard tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdr * exposure);
-    // gamma correction 
+    // gamma correction
     mapped = pow(mapped, vec3(1.0 / gamma));
-  
+
     return mapped;
 }
 
@@ -72,7 +72,7 @@ void main()
 {
     vec2  size   = textureSize(lit, 0);
     float depth  = texture(depth, texCoord).r;
-    vec3  sample = fxaa(size); // texture2D(lit,texCoord).xyz; //
+    vec3  sample = fxaa(size);
 
     sample = tone_map(sample, 1, 1);
 

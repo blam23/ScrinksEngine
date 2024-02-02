@@ -124,7 +124,7 @@ void main()
 
         float dist = length(lightPositions[i] - worldPos);
         float attenuation = 1.0 / (dist * dist);
-        vec3 radiance = lightColors[i] * attenuation;
+        vec3 radiance = vec3(100.0,1000.0,500.0) * attenuation;
 
         vec3 F0 = vec3(0.04);
         F0      = mix(F0, albedo, metallic);

@@ -158,6 +158,18 @@
     <ClCompile Include="pass_sky_map.cpp">
       <Filter>render\render_passes</Filter>
     </ClCompile>
+    <ClCompile Include="instance_renderer.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite_renderer.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="node_sprite.cpp">
+      <Filter>core\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="node_2d.cpp">
+      <Filter>core\nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -270,6 +282,18 @@
     </ClInclude>
     <ClInclude Include="pass_sky_map.h">
       <Filter>render\render_passes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="instance_renderer.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite_renderer.h">
+      <Filter>render\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_sprite.h">
+      <Filter>core\nodes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_2d.h">
+      <Filter>core\nodes\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

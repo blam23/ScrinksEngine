@@ -18,7 +18,7 @@ uniform float testA;
 
 void main()
 {
-    gAlbedo = tint;
+    gAlbedo = tint * texture(albedo, texCoord).rgb;
     
     gMRAO.r = texture(metallic, texCoord).r;
     gMRAO.g = texture(roughness, texCoord).r;

@@ -154,6 +154,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="include\imGuIZMO.quat\imGuIZMOquat.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="instance_renderer.cpp" />
     <ClCompile Include="lua_engine.cpp" />
     <ClCompile Include="metadata_helpers.cpp" />
     <ClCompile Include="model.cpp" />
@@ -161,9 +162,12 @@
     <ClCompile Include="gl3w.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="node.cpp" />
+    <ClCompile Include="node_2d.cpp" />
     <ClCompile Include="node_model.cpp" />
     <ClCompile Include="pass_environment_map.cpp" />
     <ClCompile Include="pass_sky_map.cpp" />
+    <ClCompile Include="node_sprite.cpp" />
+    <ClCompile Include="sprite_renderer.cpp" />
     <ClCompile Include="thread_pool.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="node_3d.cpp" />
@@ -197,9 +201,13 @@
     <ClInclude Include="lua_engine.h" />
     <ClInclude Include="metadata_helpers.h" />
     <ClInclude Include="node.h" />
+    <ClInclude Include="node_2d.h" />
     <ClInclude Include="node_model.h" />
+    <ClInclude Include="node_sprite.h" />
     <ClInclude Include="pass_environment_map.h" />
     <ClInclude Include="pass_sky_map.h" />
+    <ClInclude Include="instance_renderer.h" />
+    <ClInclude Include="sprite_renderer.h" />
     <ClInclude Include="thread_pool.h" />
     <ClInclude Include="script.h" />
     <ClInclude Include="node_3d.h" />

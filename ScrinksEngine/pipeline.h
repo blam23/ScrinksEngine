@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "shader.h"
 #include <memory>
+#include <typeindex>
 
 namespace scrinks::render
 {
@@ -24,7 +25,10 @@ namespace scrinks::render
 		static void unit_cube();
 
 		template <typename T_Pass>
-		static T_Pass* register_pass();
+		static T_Pass* register_pass(std::string&& name);
+
+		template <typename T_Pass>
+		static T_Pass* get_pass(const std::string& name);
 
 	public:
 		static GBuffer* gbuffer();
@@ -36,6 +40,7 @@ namespace scrinks::render
 	private:
 		static std::unique_ptr<GBuffer> s_gbuffer;
 		static std::vector<std::unique_ptr<RenderPass>> s_passes;
+		static inline std::map<std::string, RenderPass*> s_pass_map{};
 		static void setup(GLsizei width, GLsizei height);
 		static void handle_resize();
 
@@ -64,11 +69,31 @@ namespace scrinks::render
 	};
 
 	template <typename T_Pass>
-	T_Pass* Pipeline::register_pass()
+	T_Pass* Pipeline::register_pass(std::string&& name)
 	{
-		s_passes.push_back(std::make_unique<T_Pass>());
-		size_t index{ s_passes.size() - 1 };
-		return (T_Pass*)s_passes[index].get();
+		auto [itr, inserted] = s_pass_map.emplace(std::move(name), nullptr);
+
+		if (inserted)
+		{
+			s_passes.push_back(std::make_unique<T_Pass>());
+			size_t index{ s_passes.size() - 1 };
+			auto ptr{ s_passes[index].get() };
+			itr->second = ptr;
+			return (T_Pass*)ptr;
+		}
+
+		return nullptr;
+	}
+
+	template <typename T_Pass>
+	T_Pass* Pipeline::get_pass(const std::string& name)
+	{
+		auto itr = s_pass_map.find(name);
+
+		if (itr != s_pass_map.end())
+			return (T_Pass*)itr->second;
+
+		return nullptr;
 	}
 
 	struct AutoResetDepthFunc

@@ -20,6 +20,8 @@ void setup_tree()
 
 	editor::register_node_inspector("Model", editor::node_model_inspector);
 	editor::register_node_inspector("Node3D", editor::node_3d_inspector);
+	editor::register_node_inspector("Node2D", editor::node_2d_inspector);
+	editor::register_node_inspector("Sprite", editor::node_sprite_inspector);
 }
 
 void editor::register_node_inspector(const std::string& typeName, NodeInspectorFunc func)

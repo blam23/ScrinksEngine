@@ -1,5 +1,6 @@
 #include "node.h"
 #include "group.h"
+#include "game.h"
 
 #include <memory>
 #include <typeinfo>
@@ -141,6 +142,9 @@ void Node::setup_script_data()
 {
 	m_script_env["name"]
 		= [this] () { return name(); };
+
+	m_script_env["get_mouse_position"]
+		= [this] () { return Game::mouse_pos(); };
 }
 
 void Node::claim_child(Node& node)

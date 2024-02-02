@@ -146,6 +146,16 @@ void Shader::set_param(const std::string& name, const glm::vec2& value) const
 {
 	glUniform2f(glGetUniformLocation(m_id, name.c_str()), value[0], value[1]);
 }
+template <>
+void Shader::set_param(const std::string& name, glm::vec2& value) const
+{
+	glUniform2f(glGetUniformLocation(m_id, name.c_str()), value[0], value[1]);
+}
+template <>
+void Shader::set_param(const std::string& name, glm::vec2 value) const
+{
+	glUniform2f(glGetUniformLocation(m_id, name.c_str()), value[0], value[1]);
+}
 
 template <>
 void Shader::set_param(const std::string& name, const std::array<int, 2>& value) const

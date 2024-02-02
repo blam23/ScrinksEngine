@@ -193,6 +193,7 @@ void scrinks::Window::run_loop()
         float interpolation{ check_fixed_update_timer() };
         interpolation = glm::clamp(interpolation, 0.0f, 1.0f);
 
+        core::Game::update(interpolation);
         render::Pipeline::draw(interpolation);
 
         editor::render_ui();

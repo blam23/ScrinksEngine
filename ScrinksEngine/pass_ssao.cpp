@@ -58,8 +58,6 @@ void SSAO::load_assets()
 		"ssao", { "assets/shaders/empty_to_quad.vs", "assets/shaders/ssao.fs" }
 	);
 	assert(m_shader);
-
-	send_data_to_shader();
 }
 
 void SSAO::send_data_to_shader()

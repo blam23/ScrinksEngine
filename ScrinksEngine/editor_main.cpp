@@ -10,7 +10,7 @@
 
 using namespace scrinks;
 
-bool drawDebug{ true };
+bool drawDebug{ false };
 bool dbgKeyReleased{ false };
 
 bool viewportFocused{ false };
@@ -126,7 +126,7 @@ void viewport()
     if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_Escape))
         viewportActive = false;
 
-    std::shared_ptr<render::Buffer> viewport{ render::BufferManager::get("viewport") };
+    std::shared_ptr<render::Buffer> viewport{ render::BufferManager::get("sprites") };
 
     ImGuiID id = ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_PassthruCentralNode, nullptr);
     ImGuiDockNode* node = ImGui::DockBuilderGetCentralNode(id);
@@ -185,17 +185,18 @@ void editor::render_ui()
 
         check_inputs();
 
-        scene_tree();
-        
         if (drawDebug)
+        {
+            scene_tree();
             render_debug();
+        }
+
+        menu();
 
         //ImGui::ShowDemoWindow();
 
         for (const auto func : windowCallbacks)
             (*func)();
-
-        menu();
     }
     ImGui::Render();
 
@@ -209,7 +210,7 @@ void editor::render_ui()
     ImGui::UpdatePlatformWindows();
 }
 
-void scrinks::editor::register_window_func(WindowFunc* const func)
+void editor::register_window_func(WindowFunc* const func)
 {
     windowCallbacks.push_back(func);
 }

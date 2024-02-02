@@ -4,7 +4,7 @@
 
 using namespace scrinks::render;
 
-scrinks::render::RenderTarget::RenderTarget(const std::string name, BufferFormat format, GLint width, GLint height, GLenum attachment)
+scrinks::render::RenderTarget::RenderTarget(const std::string& name, BufferFormat format, GLint width, GLint height, GLenum attachment)
 {
 	m_buffer = BufferManager::reload_and_store(name, { format, attachment, width, height });
 
