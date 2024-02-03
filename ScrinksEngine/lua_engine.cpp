@@ -1,6 +1,7 @@
 #include "lua_engine.h"
+#include "lua_bindings.h"
 #include "window.h"
-
+#include "game.h"
 #include "node.h"
 
 #include <iostream>
@@ -35,6 +36,8 @@ void scrinks::lua::setup()
 		std::cerr << "Loaded lua!" << std::endl;
 	}
 
+	bindings::setup_all(mainState);
+
 	attemptedSetup = true;
 }
 
@@ -59,5 +62,52 @@ void scrinks::lua::dbg(sol::environment& env, const std::string& code)
 void scrinks::lua::dbg_print_globals(sol::environment& env)
 {
 	mainState.script("for k,v in pairs(_G) do print(k,v) end", env);
+}
+
+sol::object scrinks::lua::copy_object(const sol::object& in, sol::environment& to)
+{
+	auto type = in.get_type();
+	auto state = to.lua_state();
+
+	switch (type)
+	{
+		case sol::type::string:   return sol::make_object(state, in.as<std::string>());
+		case sol::type::number:   return sol::make_object(state, in.as<double>());
+		case sol::type::boolean:  return sol::make_object(state, in.as<bool>());
+
+		case sol::type::userdata:
+		{
+			if (in.is<glm::vec2>()) {
+				const auto& in_vec{ in.as<glm::vec2>() };
+				return sol::make_object<glm::vec2>(state, in_vec.x, in_vec.y);
+			}
+			return {};
+		}
+
+		case sol::type::table:
+		{
+			auto orig = in.as<sol::table>();
+			auto clone = to.create();
+
+			for (const auto& [k, v] : orig)
+				clone.set(copy_object(k, to), copy_object(v, to));
+
+			return clone;
+		}
+
+		// todo?
+		case sol::type::function:
+		case sol::type::lightuserdata:
+
+		// ignore
+		case sol::type::thread:
+		case sol::type::none:
+		case sol::type::lua_nil:
+		case sol::type::poly:
+		default:
+			return {};
+	}
+
+	
 }
 

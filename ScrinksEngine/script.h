@@ -23,6 +23,7 @@ namespace scrinks::lua
 
 	private:
 		sol::function m_code;
+		sol::load_result m_res;
 		std::string m_strCode;
 	};
 }

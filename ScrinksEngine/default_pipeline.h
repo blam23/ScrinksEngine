@@ -43,5 +43,11 @@ namespace scrinks::render
 		Pipeline::register_pass<pass::SpriteRender>("sprite_renderer")
 			->init("sprites");
 	}
+
+	void default_2d_pipeline()
+	{
+		Pipeline::register_pass<pass::SpriteRender>("sprite_renderer")
+			->init("viewport");
+	}
 }
 

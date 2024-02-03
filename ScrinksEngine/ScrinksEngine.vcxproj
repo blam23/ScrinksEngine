@@ -155,7 +155,10 @@
     <ClCompile Include="include\imGuIZMO.quat\imGuIZMOquat.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="instance_renderer.cpp" />
+    <ClCompile Include="lua_bindings.cpp" />
     <ClCompile Include="lua_engine.cpp" />
+    <ClCompile Include="lua_game_bindings.cpp" />
+    <ClCompile Include="lua_resource_bindings.cpp" />
     <ClCompile Include="metadata_helpers.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="gbuffer.cpp" />
@@ -164,6 +167,7 @@
     <ClCompile Include="node.cpp" />
     <ClCompile Include="node_2d.cpp" />
     <ClCompile Include="node_model.cpp" />
+    <ClCompile Include="node_root.cpp" />
     <ClCompile Include="pass_environment_map.cpp" />
     <ClCompile Include="pass_sky_map.cpp" />
     <ClCompile Include="node_sprite.cpp" />
@@ -198,11 +202,13 @@
     <ClInclude Include="editor_scene_tree.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inspector_node3d.h" />
+    <ClInclude Include="lua_bindings.h" />
     <ClInclude Include="lua_engine.h" />
     <ClInclude Include="metadata_helpers.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="node_2d.h" />
     <ClInclude Include="node_model.h" />
+    <ClInclude Include="node_root.h" />
     <ClInclude Include="node_sprite.h" />
     <ClInclude Include="pass_environment_map.h" />
     <ClInclude Include="pass_sky_map.h" />

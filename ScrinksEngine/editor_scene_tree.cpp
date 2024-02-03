@@ -162,7 +162,8 @@ void editor::scene_tree()
 				nameInput = clicked->name();
 
 			ImGui::SeparatorText("Core");
-			ImGui::InputString("Name: ", &nameInput);
+			ImGui::InputString("Name", &nameInput);
+			ImGui::Text("Thread ID - %d", node.thread_id());
 
 			if (nameInput.compare(node.name()) != 0)
 			{

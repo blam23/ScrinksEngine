@@ -11,14 +11,15 @@ using namespace scrinks::core;
 
 std::atomic<Node::ID> Node::s_id{ 0 };
 
-Node::Node(Node* m_parent, threads::Group threadGroup)
+Node::Node(Node* parent, threads::Group threadGroup)
 	: m_name{}
 	, m_script{ nullptr }
 	, m_id { s_id++ }
 	, m_thread{ threads::Reference{ this, threadGroup } }
+	, m_parent{ nullptr }
 {
-	if (m_parent)
-		m_parent->claim_child(*this);
+	if (parent)
+		parent->claim_child(*this);
 }
 
 Node::~Node()
@@ -87,7 +88,7 @@ bool scrinks::core::Node::check_has_field(const std::string& name)
 
 void Node::sync_fixed_update()
 {
-	if (m_has_fixed_update)
+	if (m_has_sync_fixed_update)
 		run_func_checked("sync_fixed_update");
 
 	for (Node* child : m_children)
@@ -97,25 +98,29 @@ void Node::sync_fixed_update()
 	}
 }
 
+void Node::load_script()
+{
+	m_script_env = lua::create_env();
+	auto res = m_script->run_no_cache(m_script_env);
+	if (!res.valid())
+	{
+		sol::error err = res;
+		std::cerr << "Failed to set script: " << err.what() << std::endl;
+	}
+
+	m_data = m_script_env.create();
+	setup_script_data();
+	run_func_checked("script_added");
+
+	m_has_fixed_update = check_has_field("fixed_update");
+	m_has_sync_fixed_update = check_has_field("sync_fixed_update");
+	m_init_lua = true;
+}
+
 void Node::fixed_update()
 {
 	if (!m_init_lua && m_script)
-	{
-		m_script_env = lua::create_env();
-		auto res = m_script->run_no_cache(m_script_env);
-		if (!res.valid())
-		{
-			sol::error err = res;
-			std::cerr << "Failed to set script: " << err.what() << std::endl;
-		}
-
-		setup_script_data();
-		run_func_checked("script_added");
-
-		m_has_fixed_update = check_has_field("fixed_update");
-		m_has_sync_fixed_update = check_has_field("sync_fixed_update");
-		m_init_lua = true;
-	}
+		load_script();
 
 	if (m_has_fixed_update)
 		run_func_checked("fixed_update");
@@ -138,18 +143,23 @@ void Node::set_script(std::shared_ptr<lua::Script> script)
 	m_script = script;
 }
 
+void Node::set_and_load_script(std::shared_ptr<lua::Script> script)
+{
+	set_script(script);
+	load_script();
+}
+
 void Node::setup_script_data()
 {
+	m_script_env["this_node"] = this;
+
 	m_script_env["name"]
 		= [this] () { return name(); };
-
-	m_script_env["get_mouse_position"]
-		= [this] () { return Game::mouse_pos(); };
 }
 
 void Node::claim_child(Node& node)
 {
-	if (node.m_parent)
+	if (node.m_parent != nullptr)
 		node.m_parent->disown_child(node);
 
 	m_children.push_back(&node);

@@ -66,7 +66,7 @@ void camera_info()
     ImGui::End();
 }
 
-bool requestVsync{ true };
+bool requestVsync{ false };
 void debug()
 {
     bool vsyncEnabled = Window::is_vsync_enabled();

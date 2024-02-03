@@ -126,7 +126,7 @@ void viewport()
     if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_Escape))
         viewportActive = false;
 
-    std::shared_ptr<render::Buffer> viewport{ render::BufferManager::get("sprites") };
+    std::shared_ptr<render::Buffer> viewport{ render::BufferManager::get("viewport") };
 
     ImGuiID id = ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_PassthruCentralNode, nullptr);
     ImGuiDockNode* node = ImGui::DockBuilderGetCentralNode(id);

@@ -8,7 +8,7 @@ namespace scrinks::core::nodes
 	class Sprite : public Node2D
 	{
 	public:
-		Sprite(Node* parent, float tileIndex, const glm::vec2& position);
+		Sprite(Node* parent, float tileIndex, float x, float y);
 		virtual ~Sprite();
 
 		void set_tile_index(float tileIndex) { m_tileIndex = tileIndex; }
@@ -20,6 +20,7 @@ namespace scrinks::core::nodes
 	protected:
 		virtual const std::string_view default_name() const { return "Sprite"; }
 		virtual void setup_script_data() override;
+		//virtual void fixed_update() override;
 		void fill_sprite_data(scrinks::render::SpriteInstance& out, float interpolate) const;
 
 	private:

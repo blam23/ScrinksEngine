@@ -18,5 +18,6 @@ namespace scrinks::lua
 	void dbg(sol::environment& env, const std::string& code);
 	void dbg_print_globals(sol::environment& env);
 	sol::state& state();
+	sol::object copy_object(const sol::object& in, sol::environment& to);
 }
 

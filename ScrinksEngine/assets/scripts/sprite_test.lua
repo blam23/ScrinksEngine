@@ -1,5 +1,5 @@
 grab_radius = 100
-wander_range = 50
+wander_range = 100
 dst_cooldown = (math.random() + 2)
 dst_current = math.random() * dst_cooldown
 
@@ -9,6 +9,8 @@ start_x = 0
 start_y = 0
 dst_x = 0
 dst_y = 0
+
+speed = math.random() * 10
 
 function distance_sqrd(ax, ay, bx, by)
     local dx = ax - bx
@@ -36,7 +38,7 @@ function random_dst(xrange, yrange)
 end
 
 function script_added()
-    random_pos(1920, 1080)
+    random_pos(1900, 1000)
     dst_x, dst_y = start_x, start_y
 end
 
@@ -48,21 +50,24 @@ function fixed_update()
         random_dst(wander_range,wander_range)
     end
 
-    local mouse_x, mouse_y = get_mouse_position()
-    mouse_y = mouse_y - 30
-    local dist = distance_sqrd(mouse_x, mouse_y, last_x, last_y)
-
-    local target_x, target_y = dst_x, dst_y
-    local move_speed = .1
-    if dist < grab_radius * grab_radius then
-        dist = math.sqrt(dist)
-        target_x, target_y = ((last_x-mouse_x) / dist) * 50, ((last_y-mouse_y) / dist) * 50
-        target_x = target_x + last_x
-        target_y = target_y + last_y
-        move_speed = .3
+    if is_key_down(546) then
+        dst_x = dst_x - 1 * speed
     end
 
-    local nx = last_x + ((target_x - last_x) * move_speed)
-    local ny = last_y + ((target_y - last_y) * move_speed)
+    if is_key_down(549) then
+        dst_x = dst_x + 1 * speed
+    end
+
+    if is_key_down(568) then
+        dst_y = dst_y - 1 * speed
+    end
+
+    if is_key_down(564) then
+        dst_y = dst_y + 1 * speed
+    end
+
+    local target_x, target_y = dst_x, dst_y
+    local nx = last_x + ((target_x - last_x) * .1)
+    local ny = last_y + ((target_y - last_y) * .1)
     set_pos2(nx, ny)
 end

@@ -3,8 +3,8 @@
 
 using namespace scrinks::core::nodes;
 
-Sprite::Sprite(Node* parent, float tileIndex, const glm::vec2& position)
-	: Node2D{ parent, { position, { 1.0f, 1.0f }, 0 } }
+Sprite::Sprite(Node* parent, float tileIndex, float x, float y)
+	: Node2D{ parent, { { x, y }, { 1.0f, 1.0f }, 0 } }
 	, m_tileIndex{ tileIndex }
 {
 	scrinks::render::SpriteInstance si;
@@ -33,8 +33,15 @@ void Sprite::fill_sprite_data(scrinks::render::SpriteInstance& out, float interp
 
 void Sprite::setup_script_data()
 {
+	m_script_env["sprite"] = this;
+
 	Node2D::setup_script_data();
 }
+
+//void Sprite::fixed_update()
+//{
+//	Node2D::fixed_update();
+//}
 
 void Sprite::update_sprite_data(float interpolate)
 {

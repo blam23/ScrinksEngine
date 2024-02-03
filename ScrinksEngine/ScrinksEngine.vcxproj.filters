@@ -161,14 +161,26 @@
     <ClCompile Include="instance_renderer.cpp">
       <Filter>render</Filter>
     </ClCompile>
-    <ClCompile Include="sprite_renderer.cpp">
-      <Filter>main</Filter>
-    </ClCompile>
     <ClCompile Include="node_sprite.cpp">
       <Filter>core\nodes</Filter>
     </ClCompile>
     <ClCompile Include="node_2d.cpp">
       <Filter>core\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="node_root.cpp">
+      <Filter>core\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_game_bindings.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_bindings.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_resource_bindings.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite_renderer.cpp">
+      <Filter>render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -294,6 +306,12 @@
     </ClInclude>
     <ClInclude Include="node_2d.h">
       <Filter>core\nodes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_root.h">
+      <Filter>core\nodes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="lua_bindings.h">
+      <Filter>core\lua\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

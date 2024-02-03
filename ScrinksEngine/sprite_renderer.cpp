@@ -41,7 +41,7 @@ void SpriteRenderer::setup_shader()
     m_shader->set_param("tex", 0);
     m_shader->set_param("tiles", m_tilesPerRow);
     m_shader->set_param("scale", scale);
-    m_shader->set_param<const glm::mat4&>("projection", glm::ortho(0.0f, (float)Pipeline::view_width(), (float)Pipeline::view_height(), 0.0f, -10000.0f, 10000.0f));
+    m_shader->set_param<const glm::mat4&>("projection", glm::ortho(0.0f, (float)Pipeline::view_width(), (float)Pipeline::view_height(), 0.0f, -1.0f, 1.0f));
 }
 
 pass::SpriteRender* pass::SpriteRender::init(std::string_view bufferName)

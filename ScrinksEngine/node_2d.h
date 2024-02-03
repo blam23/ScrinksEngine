@@ -34,12 +34,11 @@ namespace scrinks::core
 		float rot() { return m_current.rot; }
 		float* rot_ptr() { return &m_current.rot; }
 		glm::vec2& scale() { return m_current.scale; }
+		std::pair<float, float> get_position() { return std::make_pair(m_current.pos.x, m_current.pos.y); }
 
 		void sync_fixed_update() override;
-		void set_position(const glm::vec2& pos);
-		void set_position(float x, float y);
+		void set_position(const glm::vec2&);
 		void translate(const glm::vec2& offset);
-		void translate(float x, float y);
 		void rotate(float angle);
 		void set_rotation(float angle);
 

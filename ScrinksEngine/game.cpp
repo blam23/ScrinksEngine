@@ -2,14 +2,16 @@
 #include "node_model.h"
 #include "pipeline.h"
 #include "node_sprite.h"
+#include "node_root.h"
 
 using namespace scrinks::core;
 
-void Game::init(std::unique_ptr<Node>&& r)
+void Game::init(std::string_view gameScriptPath)
 {
-	s_root = std::move(r);
+	s_root = std::make_unique<nodes::Root>();
+	s_root->set_script(lua::ScriptManager::load_and_store("game", gameScriptPath.data()));
 
-	s_spriteRenderer = std::make_shared<scrinks::render::SpriteRenderer>(render::TextureManager::load_and_store("mc", "assets/textures/tilemap_packed.png"), 12, 55000);
+	s_spriteRenderer = std::make_shared<scrinks::render::SpriteRenderer>(render::TextureManager::load_and_store("mc", "D:/Assets/space/space.png"), 16, 395000);
 	s_spriteRenderer->init();
 
 	auto sr = scrinks::render::Pipeline::get_pass<scrinks::render::pass::SpriteRender>("sprite_renderer");
@@ -33,18 +35,17 @@ void Game::init(std::unique_ptr<Node>&& r)
 	//	}
 	//}
 
-	// Test Sprites
-	for (int y = 0; y < 100; y ++)
-	{
-		for (int x = 0; x < 100; x ++)
-		{
-			auto sprite = s_root->new_child<nodes::Sprite>(glm::linearRand(60.0f, 64.0f), glm::vec2{x, y});
-			sprite->rename("sprite[" + std::to_string(x) + "," + std::to_string(y) + "]");
-			sprite->set_script(lua::ScriptManager::load_and_store("sprite", "assets/scripts/sprite.lua"));
-		}
-	}
+	//// Test Sprites
+	//for (int i = 0; i < 10'000; i++)
+	//{
+	//	auto sprite = s_root->new_child<nodes::Sprite>(glm::linearRand(60.0f, 64.0f), glm::vec2{ glm::linearRand(0.0f, 1920.0f), glm::linearRand(0.0f, 1080.0f) });
+	//	sprite->rename("sprite[" + std::to_string(i) + "]");
+	//	sprite->set_script(lua::ScriptManager::load_and_store("sprite", "assets/scripts/sprite_test.lua"));
+	//}
 
-	std::cout << "Sprites: " << s_spriteRenderer->m_count << std::endl;
+	//std::cout << "Sprites: " << s_spriteRenderer->m_count << std::endl;
+
+	s_root->start_game();
 }
 
 void Game::update(float interpolate)

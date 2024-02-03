@@ -31,12 +31,10 @@ void Texture::bind(GLenum unit) const
 	glBindTexture(GL_TEXTURE_2D, m_id);
 }
 
-
-
 template <>
 std::shared_ptr<Texture> TextureManager::load(const std::string& name, const TextureDescription& desc)
 {
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(false);
 
 	int width, height, channels;
 	
@@ -82,6 +80,9 @@ std::shared_ptr<Texture> TextureManager::load(const std::string& name, const Tex
 		}
 		else
 		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 			if (channels == 1)
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, dataType, data);
 

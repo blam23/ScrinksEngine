@@ -83,7 +83,7 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
     if (s_window == nullptr)
         return false;
     glfwMakeContextCurrent(s_window);
-    set_vsync(true);
+    set_vsync(false);
 
     if (gl3wInit())
     {
@@ -109,7 +109,8 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
 
 void setup_pipeline()
 {
-    render::default_pipeline();
+    // todo: get this from game config data
+    render::default_2d_pipeline();
 }
 
 bool Window::init(int width, int height, const std::string& name)
@@ -133,7 +134,7 @@ bool Window::init(int width, int height, const std::string& name)
 
     setup_pipeline();
 
-    core::Game::init(std::make_unique<core::Node>(nullptr));
+    core::Game::init("assets/scripts/game.lua");
 
     return true;
 }

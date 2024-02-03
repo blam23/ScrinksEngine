@@ -10,8 +10,10 @@ uniform vec2 scale;
 
 void main()
 {
-    texCoord.x = meshData.z;
-    texCoord.y = -meshData.w;
+    texCoord = meshData.zw;
     tileIdx = instanceData.z;
-    gl_Position = projection * vec4((meshData.xy * scale) + instanceData.xy, 0.0, 1.0);
+
+    // vec2 pos = round(instanceData.xy);
+    vec2 pos = instanceData.xy;
+    gl_Position = projection * vec4((meshData.xy * scale) + pos, 0.0, 1.0);
 }
