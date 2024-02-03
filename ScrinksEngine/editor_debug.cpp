@@ -93,12 +93,6 @@ void debug()
             core::Game::check_resources();
         }
 
-        if (ImGui::Button("Reload Scripts"))
-        {
-            lua::ScriptManager::reload_all();
-            core::Game::check_resources();
-        }
-
         if (ImGui::CollapsingHeader("Floats"))
         {
             for (auto& [name, value] : debug::get_all_test_floats())

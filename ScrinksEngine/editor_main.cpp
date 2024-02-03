@@ -5,6 +5,7 @@
 #include "pipeline.h"
 #include "editor_debug.h"
 #include "editor_scene_tree.h"
+#include "game.h"
 
 #include <vector>
 
@@ -89,6 +90,12 @@ void menu()
     {
         ImGui::Text("Scrinks");
 
+        if (ImGui::Button("Reload Scripts"))
+        {
+            lua::ScriptManager::reload_all();
+            core::Game::check_resources();
+        }
+
         ImGui::SameLine(ImGui::GetWindowWidth() - 295);
         ImGui::TextColored(vsyncEnabled ? info_regular : info_highlight, "%.3f ms/frame (%.1f FPS) [%.1f fixed]", 1000.0f / io.Framerate, io.Framerate, Window::fixed_updates_per_second());
     }
@@ -99,26 +106,19 @@ void check_inputs()
 {
     if (viewportActive)
     {
-        Window::set_capture_cursor(true);
-
-        ImGui::SetMouseCursor(ImGuiMouseCursor_None);
         handle_input();
     }
-    else
-    {
-        Window::set_capture_cursor(false);
 
-        if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_F11))
+    if (ImGui::IsKeyDown(ImGuiKey::ImGuiKey_F11))
+    {
+        if (dbgKeyReleased)
         {
-            if (dbgKeyReleased)
-            {
-                drawDebug = !drawDebug;
-                dbgKeyReleased = false;
-            }
+            drawDebug = !drawDebug;
+            dbgKeyReleased = false;
         }
-        else
-            dbgKeyReleased = true;
     }
+    else
+        dbgKeyReleased = true;
 }
 
 void viewport()
@@ -158,7 +158,7 @@ void viewport()
 
             ImGui::Image((void*)(intptr_t)viewport->id(), ImVec2{ viewportPanelSize.x, viewportPanelSize.y }, { 0, 1 }, { 1, 0 });
 
-            if (viewportActive)
+            if (viewportActive && drawDebug)
             {
                 ImVec2 viewRect{ node->Pos.x + viewportPanelSize.x, node->Pos.y + viewportPanelSize.y };
                 ImGui::GetForegroundDrawList()->AddRect(node->Pos, viewRect, IM_COL32(0, 255, 200, 255), 0, 0, 2.0f);
