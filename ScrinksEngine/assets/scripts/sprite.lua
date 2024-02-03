@@ -1,9 +1,14 @@
-i = 0
-update = (((math.random()-0.5) * 4) + 4) / 10
-radius = (math.random() * 10) + 1
+grab_radius = 100
+wander_range = 100
+dst_cooldown = (math.random() + 2)
+dst_current = math.random() * dst_cooldown
+
 last_x = 0
 last_y = 0
-grab_radius = 100
+start_x = 0
+start_y = 0
+dst_x = 0
+dst_y = 0
 
 function distance_sqrd(ax, ay, bx, by)
     local dx = ax - bx
@@ -18,26 +23,41 @@ function set_pos2(x, y)
 end
 
 function random_pos(xrange, yrange)
-    x = math.random() * xrange
-    y = math.random() * yrange
+    local x = math.random() * xrange
+    local y = math.random() * yrange
     set_pos2(x, y)
+    start_x = x
+    start_y = y
+end
+
+function random_dst(xrange, yrange)
+    dst_x = start_x + (math.random()-0.5) * xrange
+    dst_y = start_y + (math.random()-0.5) * yrange
 end
 
 function script_added()
     random_pos(1900, 1000)
+    dst_x, dst_y = start_x, start_y
 end
 
 function fixed_update()
+    -- todo: get delta
+    dst_current = dst_current - 0.04
+    if dst_current <= 0 then
+        dst_current = dst_cooldown
+        random_dst(wander_range,wander_range)
+    end
+
     local mouse_x, mouse_y = get_mouse_position()
     mouse_y = mouse_y - 30
     local sqr_dist = distance_sqrd(mouse_x, mouse_y, last_x, last_y)
 
+    local target_x, target_y = dst_x, dst_y
     if sqr_dist < grab_radius * grab_radius then
-        local nx = last_x + ((mouse_x - last_x) * .1)
-        local ny = last_y + ((mouse_y - last_y) * .1)
-        set_pos2(nx, ny)
-    else
-        i = i + update
-        set_pos2(x + math.sin(i) * radius, y + math.cos(i) * radius)
+        target_x, target_y = mouse_x, mouse_y
     end
+
+    local nx = last_x + ((target_x - last_x) * .1)
+    local ny = last_y + ((target_y - last_y) * .1)
+    set_pos2(nx, ny)
 end

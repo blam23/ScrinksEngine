@@ -38,7 +38,7 @@ void Game::init(std::unique_ptr<Node>&& r)
 	{
 		for (int x = 0; x < 100; x ++)
 		{
-			auto sprite = s_root->new_child<nodes::Sprite>(glm::linearRand(0.0f, 1024.0f), glm::vec2{x, y});
+			auto sprite = s_root->new_child<nodes::Sprite>(glm::linearRand(60.0f, 64.0f), glm::vec2{x, y});
 			sprite->rename("sprite[" + std::to_string(x) + "," + std::to_string(y) + "]");
 			sprite->set_script(lua::ScriptManager::load_and_store("sprite", "assets/scripts/sprite.lua"));
 		}
