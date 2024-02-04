@@ -17,6 +17,9 @@ Sprite::Sprite(Node* parent, float tileIndex, float x, float y)
 
 Sprite::~Sprite()
 {
+	scrinks::render::SpriteInstance si{ -1000, -1000, -1 };
+	Game::sprite_renderer()->update_instance(m_index, si);
+
 	s_sprites.erase(std::find(s_sprites.begin(), s_sprites.end(), this));
 }
 

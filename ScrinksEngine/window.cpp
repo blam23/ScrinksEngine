@@ -18,8 +18,8 @@ using namespace scrinks;
 bool Window::s_vsync{ true };
 bool Window::s_inputActive{ false };
 GLenum Window::s_log_level{ GL_DEBUG_SEVERITY_LOW };
-int Window::s_windowWidth { 0 };
-int Window::s_windowHeight{ 0 };
+int Window::s_windowWidth { 1920 };
+int Window::s_windowHeight{ 1080 };
 GLFWwindow* Window::s_window{ nullptr };
 
 std::vector<Window::FixedUpdateCallback> Window::s_fixedUpdateCallbacks{};

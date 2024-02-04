@@ -5,6 +5,7 @@
 #include "node.h"
 
 #include <iostream>
+#include <mutex>
 
 using namespace scrinks::lua;
 
@@ -64,22 +65,21 @@ void scrinks::lua::dbg_print_globals(sol::environment& env)
 	mainState.script("for k,v in pairs(_G) do print(k,v) end", env);
 }
 
-sol::object scrinks::lua::copy_object(const sol::object& in, sol::environment& to)
+sol::object scrinks::lua::copy_object(const sol::object& in, sol::state& to)
 {
 	auto type = in.get_type();
-	auto state = to.lua_state();
 
 	switch (type)
 	{
-		case sol::type::string:   return sol::make_object(state, in.as<std::string>());
-		case sol::type::number:   return sol::make_object(state, in.as<double>());
-		case sol::type::boolean:  return sol::make_object(state, in.as<bool>());
+		case sol::type::string:   return sol::make_object(to, in.as<std::string>());
+		case sol::type::number:   return sol::make_object(to, in.as<double>());
+		case sol::type::boolean:  return sol::make_object(to, in.as<bool>());
 
 		case sol::type::userdata:
 		{
 			if (in.is<glm::vec2>()) {
 				const auto& in_vec{ in.as<glm::vec2>() };
-				return sol::make_object<glm::vec2>(state, in_vec.x, in_vec.y);
+				return sol::make_object<glm::vec2>(to, in_vec.x, in_vec.y);
 			}
 			return {};
 		}
@@ -87,7 +87,7 @@ sol::object scrinks::lua::copy_object(const sol::object& in, sol::environment& t
 		case sol::type::table:
 		{
 			auto orig = in.as<sol::table>();
-			auto clone = to.create();
+			auto clone = to.create_table();
 
 			for (const auto& [k, v] : orig)
 				clone.set(copy_object(k, to), copy_object(v, to));
@@ -109,5 +109,59 @@ sol::object scrinks::lua::copy_object(const sol::object& in, sol::environment& t
 	}
 
 	
+}
+
+//
+// Shared State
+// Used to ferry data between different lua states.
+//
+
+std::map<SharedID, sol::object> s_sharedState{};
+SharedID s_lastID;
+sol::state sharedState;
+bool setupSharedState{ false };
+std::mutex shareMutex;
+
+void check_shared_state()
+{
+	if (!setupSharedState)
+	{
+		sharedState.open_libraries();
+		setupSharedState = true;
+	}
+}
+
+SharedID scrinks::lua::send_to_shared(const sol::object& obj)
+{
+	std::lock_guard lock{ shareMutex };
+
+	check_shared_state();
+
+	SharedID id{ s_lastID };
+	s_sharedState[id] = copy_object(obj, sharedState);
+
+	s_lastID++;
+	if (s_lastID == (std::numeric_limits<size_t>().max)())
+		s_lastID = 0;
+
+	return id;
+}
+
+sol::object scrinks::lua::get_from_shared(SharedID id)
+{
+	std::lock_guard lock{ shareMutex };
+
+	if (!setupSharedState)
+		return sol::nil;
+
+	if (const auto itr = s_sharedState.find(id); itr != s_sharedState.end())
+	{
+		auto ret{ copy_object(itr->second, mainState) };
+		s_sharedState.erase(itr);
+
+		return ret;
+	}
+
+	return sol::nil;
 }
 

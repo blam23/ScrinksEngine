@@ -35,7 +35,7 @@ void SpriteRenderer::init()
 
 void SpriteRenderer::setup_shader()
 {
-    static glm::vec2 scale{ 32.f, 32.f };
+    static glm::vec2 scale{ 16.f, 16.f };
 
     m_texture->bind(GL_TEXTURE0);
     m_shader->set_param("tex", 0);

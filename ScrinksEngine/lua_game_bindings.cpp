@@ -29,20 +29,21 @@ void setup_game_bindings(sol::state& env)
 	env["get_root_node"]
 		= [] () { return (core::Node*)core::Game::root(); };
 
-	auto node = env["node"].get_or_create<sol::table>();
-	node.new_usertype<core::Node>("base",
+	env.new_usertype<core::Node>("base",
 		"rename", &core::Node::rename,
 		"set_script", &core::Node::set_script,
 		"set_and_load_script", &core::Node::set_and_load_script,
-		"data", &core::Node::m_data);
+		"set_property", &core::Node::set_property,
+		"get_property", &core::Node::get_property,
+		"mark_for_deletion", &core::Node::mark_for_deletion);
 
-	node.new_usertype<core::Node2D>("node2D",
+	env.new_usertype<core::Node2D>("node2D",
 		"set_position", &core::Node2D::set_position,
 		"get_position", &core::Node2D::get_position,
 		"translate", &core::Node2D::translate,
 		sol::base_classes, sol::bases<core::Node>());
 
-	node.new_usertype<core::nodes::Sprite>("sprite",
+	env.new_usertype<core::nodes::Sprite>("sprite",
 		"set_tile_index", &core::nodes::Sprite::set_tile_index,
 		sol::base_classes, sol::bases<core::Node2D, core::Node>());
 

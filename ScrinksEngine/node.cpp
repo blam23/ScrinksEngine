@@ -6,6 +6,7 @@
 #include <typeinfo>
 #include <thread>
 #include "metadata_helpers.h"
+#include <glm/gtx/string_cast.hpp>
 
 using namespace scrinks::core;
 
@@ -41,7 +42,7 @@ const char* Node::type() const
 	return default_name().data();
 }
 
-void scrinks::core::Node::reserve_child_nodes(size_t amount)
+void Node::reserve_child_nodes(size_t amount)
 {
 	m_children.reserve(amount);
 }
@@ -75,7 +76,7 @@ void Node::reload_script_if_outdated()
 	}
 }
 
-bool scrinks::core::Node::check_has_field(const std::string& name)
+bool Node::check_has_field(const std::string& name)
 {
 	if (m_script && m_script_env.valid())
 	{
@@ -86,8 +87,60 @@ bool scrinks::core::Node::check_has_field(const std::string& name)
 	return false;
 }
 
+void Node::cleanup_children()
+{
+	size_t i = m_children.size() - 1;
+
+	while (true)
+	{
+		const auto child = m_children[i];
+
+		if (!child)
+		{
+			m_children.erase(m_children.begin() + i);
+		}
+		else if (child->m_marked_for_deletion)
+		{
+			m_children.erase(m_children.begin() + i);
+			delete child;
+		}
+		else
+		{
+			if (child->m_requires_cleanup)
+				child->cleanup_children();
+		}
+
+		if (i == 0)
+			break;
+
+		i--;
+	}
+}
+
+bool Node::on_correct_thread()
+{
+	return threads::on_my_thread(m_thread);
+}
+
+void Node::copy_shared_data()
+{
+	if (!on_correct_thread())
+		return;
+
+	for (const auto& [key, value] : m_shared)
+		m_data[key] = lua::get_from_shared(value);
+
+	m_shared.clear();
+}
+
 void Node::sync_fixed_update()
 {
+	if (m_marked_for_deletion)
+		return;
+
+	if (m_requires_cleanup)
+		cleanup_children();
+
 	if (m_has_sync_fixed_update)
 		run_func_checked("sync_fixed_update");
 
@@ -96,6 +149,23 @@ void Node::sync_fixed_update()
 		if (child)
 			child->sync_fixed_update();
 	}
+}
+
+void scrinks::core::Node::mark_for_child_cleanup()
+{
+	m_requires_cleanup = true;
+
+	if (m_parent)
+		m_parent->mark_for_child_cleanup();
+}
+
+
+void scrinks::core::Node::mark_for_deletion()
+{
+	m_marked_for_deletion = true;
+
+	if (m_parent)
+		m_parent->mark_for_child_cleanup();
 }
 
 void Node::load_script()
@@ -108,8 +178,8 @@ void Node::load_script()
 		std::cerr << "Failed to set script: " << err.what() << std::endl;
 	}
 
-	m_data = m_script_env.create();
 	setup_script_data();
+	copy_shared_data();
 	run_func_checked("script_added");
 
 	m_has_fixed_update = check_has_field("fixed_update");
@@ -119,14 +189,20 @@ void Node::load_script()
 
 void Node::fixed_update()
 {
+	if (m_marked_for_deletion)
+		return;
+
 	if (!m_init_lua && m_script)
 		load_script();
 
 	if (m_has_fixed_update)
+	{
+		copy_shared_data();
 		run_func_checked("fixed_update");
+	}
 }
 
-void scrinks::core::Node::check_resources()
+void Node::check_resources()
 {
 	reload_script_if_outdated();
 
@@ -149,9 +225,34 @@ void Node::set_and_load_script(std::shared_ptr<lua::Script> script)
 	load_script();
 }
 
+void Node::set_property(const std::string& name, const sol::object& value)
+{
+	//const auto id{ lua::send_to_shared(value) };
+	//m_shared[name] = id;
+
+	if (on_correct_thread())
+	{
+		m_data[name] = value;
+	}
+	else
+	{
+		// need to copy to shared data and pull from it later when on this node's thread.
+		const auto id{ lua::send_to_shared(value) };
+		m_shared[name] = id;
+	}
+}
+
+sol::object Node::get_property(const std::string& name)
+{
+	if (auto itr = m_data.find(name); itr != m_data.end())
+		return itr->second;
+
+	return sol::nil;
+}
+
 void Node::setup_script_data()
 {
-	m_script_env["this_node"] = this;
+	m_script_env["node"] = this;
 
 	m_script_env["name"]
 		= [this] () { return name(); };

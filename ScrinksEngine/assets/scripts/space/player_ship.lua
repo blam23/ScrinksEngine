@@ -1,15 +1,18 @@
 require "lib.key_map"
 require_asset "space.timer"
-local move_speed = 400
+local move_speed = 10
 
-local attack_timer = timer:new(0.1)
+local attack_timer = timer:new(0.02)
 local bullet_script = load_script("assets/scripts/space/player_bullet.lua")
-local bullet_count = 3
-local bullet_spread = 0.3
+local bullet_count = 10
+local total_arc_angle = math.rad(30)
+local arc_rotation = (-total_arc_angle/2) - math.rad(90)
+local bullet_change = 5
+local random_spread = 0.05
 
 function script_added()
     print(get_view_size())
-    transform:set_position(vec2.new(100, 100))
+    transform:set_position(vec2.new(1920/2, 1050/2))
 end
 
 function fixed_update()
@@ -19,14 +22,16 @@ function fixed_update()
     if attack_timer:tick() then
         local x, y = transform:get_position()
         for i = 1, bullet_count do
-            local offset = (-bullet_count / 2) + i - 0.5
+            local arc_factor = total_arc_angle/bullet_count * (i-0.5)
+            local a = arc_factor + arc_rotation + (math.random()-0.5) * random_spread
+            local vec = vec2.new(math.cos(a), math.sin(a))
             local bullet = create_sprite_node(
-                16,
-                x + 12,
-                y
+                17,
+                x + 8 + (vec.x * 10),
+                y + (vec.y * 10)
             )
             bullet:set_script(bullet_script)
-            --bullet.data.velocity = vec2.new(offset * bullet_spread, -1)
+            bullet:set_property("velocity", vec)
         end
     end
 
@@ -47,7 +52,7 @@ function fixed_update()
     end
 
     if input_down then
-        velocity = velocity:normalize() * move_speed * fixed_delta
+        velocity = velocity:normalize() * move_speed
         transform:translate(velocity)
 
     --     if velocity.x < 0 then

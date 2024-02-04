@@ -1,14 +1,20 @@
-require "lib.key_map"
+local screen_bound_buffer = 30
 
-local move_speed = 700
+velocity = vec2.new(0, -1)
+move_speed = 13
 
 function script_added()
-    if this_node.data.velocity == nil then
-        this_node.data.velocity = vec2.new(0, -1)
-    end
+    velocity = node:get_property("velocity"):normalize() or velocity
+    move_speed = node:get_property("speed") or move_speed
 end
 
 function fixed_update()
-    local velocity = this_node.data.velocity:normalize() * move_speed * fixed_delta
-    transform:translate(velocity)
+    transform:translate(velocity * move_speed)
+
+    local x, y = transform:get_position()
+    local w, h = get_view_size()
+    if x < -screen_bound_buffer or x > w + screen_bound_buffer
+    or y < -screen_bound_buffer or y > h + screen_bound_buffer then
+        node:mark_for_deletion()
+    end
 end

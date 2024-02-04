@@ -13,11 +13,15 @@ namespace scrinks::lua
 {
 	void setup();
 
+	using SharedID = std::size_t;
+
 	sol::environment create_env();
 	sol::load_result load(const std::string& code, const std::string& file);
 	void dbg(sol::environment& env, const std::string& code);
 	void dbg_print_globals(sol::environment& env);
-	sol::state& state();
-	sol::object copy_object(const sol::object& in, sol::environment& to);
+
+	sol::object copy_object(const sol::object&, sol::state& to);
+	SharedID send_to_shared(const sol::object&);
+	sol::object get_from_shared(SharedID);
 }
 

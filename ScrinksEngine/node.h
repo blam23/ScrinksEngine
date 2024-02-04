@@ -30,12 +30,18 @@ namespace scrinks::core
 		const char* type() const;
 		ID id() const { return m_id; }
 		void rename(const std::string& name) { m_name = name; }
+		void mark_for_deletion();
+		void mark_for_child_cleanup();
+		
 		void set_script(std::shared_ptr<lua::Script> script);
 		void set_and_load_script(std::shared_ptr<lua::Script> script);
+
+		void set_property(const std::string& name, const sol::object& value);
+		sol::object get_property(const std::string& name);
+		
 		// If you're gonna add a shit tonne of child nodes..
 		void reserve_child_nodes(size_t amount);
 		scrinks::threads::ID thread_id() const { return m_thread.m_thread_id; }
-		sol::table m_data;
 
 		template <typename T_Node, class... T_Args>
 		T_Node* new_child(T_Args... args)
@@ -69,26 +75,34 @@ namespace scrinks::core
 		void run_func_checked(const std::string& func);
 		virtual void setup_script_data();
 		void load_script();
+		void cleanup_children();
 
 	private:
 		void claim_child(Node& node);
 		void disown_child(Node& node);
 		void reload_script_if_outdated();
 		bool check_has_field(const std::string& name);
+		bool on_correct_thread();
+		void copy_shared_data();
 
 	protected:
 		sol::environment m_script_env;
 		threads::Reference m_thread;
 
 	private:
+		bool m_marked_for_deletion;
+		bool m_requires_cleanup;
+
 		Node* m_parent;
 		std::vector<Node*> m_children;
-		std::shared_ptr<scrinks::lua::Script> m_script;
+		std::shared_ptr<lua::Script> m_script;
 		std::string m_name;
 		ID m_id;
 		bool m_init_lua;
 		bool m_has_fixed_update{ false };
 		bool m_has_sync_fixed_update{ false };
+		std::map<std::string, sol::object> m_data;
+		std::map<std::string, lua::SharedID> m_shared;
 
 		static std::atomic<ID> s_id;
 	};

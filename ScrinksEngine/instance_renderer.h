@@ -39,13 +39,16 @@ namespace scrinks::render
 		void set_shader(std::shared_ptr<Shader>& shader) { m_shader = shader; }
 
 		std::vector<float> m_data{};
-		std::size_t m_dataUsedLength{ 0 };
+		std::size_t m_cursor{ 0 };
+		bool m_looped{ false };
+
 		GLuint m_vao{};
 		GLuint m_vbo{};
 
 		std::shared_ptr<Shader> m_shader;
 		GLenum m_drawType{ GL_TRIANGLE_STRIP };
 		GLint m_stride{ 4 };
+
 	};
 
 	template<typename T_Instance>
@@ -126,14 +129,17 @@ namespace scrinks::render
 	template<typename T_Instance>
 	inline size_t InstanceRenderer<T_Instance>::push(const T_Instance& data)
 	{
-		if (m_dataUsedLength == m_data.size())
+		if (m_cursor * INSTANCE_SIZE * 4 >= m_data.size())
 		{
-			std::cerr << "Instance buffer is full!" << std::endl;
-			return (std::numeric_limits<std::size_t>::max)();
+			m_cursor = 1000;
+			m_looped = true;
 		}
 
-		update_instance(m_count, data);
-		m_dataUsedLength += INSTANCE_SIZE;
-		return m_count++;
+		update_instance(m_cursor, data);
+
+		if (!m_looped)
+			m_count++;
+
+		return m_cursor++;
 	}
 }
