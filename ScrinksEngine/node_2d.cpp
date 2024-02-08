@@ -12,21 +12,6 @@ Node2D::Node2D(Node* parent, const Transform2D& position)
 
 void scrinks::core::Node2D::setup_script_data()
 {
-	/*m_script_env["set_pos"]
-		= [this] (float x, float y) { return set_position(x, y); };
-
-	m_script_env["translatef"]
-		= [this] (float x, float y) { return translate(x, y); };
-
-	m_script_env["translate"]
-		= [this] (const glm::vec2& vec) { return translate(vec); };
-
-	m_script_env["rotate"]
-		= [this] (float a) { return rotate(a); };
-
-	m_script_env["set_rotation"]
-		= [this] (float a) { return set_rotation(a); };*/
-
 	m_script_env["transform"] = this;
 
 	Node::setup_script_data();
