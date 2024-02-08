@@ -3,9 +3,11 @@
 #include "helpers.h"
 #include "shader.h"
 #include "pipeline.h"
+
 #include <vector>
 #include <type_traits>
 #include <iostream>
+#include <numeric>
 
 namespace scrinks::render
 {
@@ -56,7 +58,7 @@ namespace scrinks::render
 		: m_shader{ shader }
 	{
 		m_data.resize(count * INSTANCE_SIZE);
-
+		std::iota(m_data.begin(), m_data.end(), -1000.0f);
 		glGenBuffers(1, &m_vbo);
 		glGenVertexArrays(1, &m_vao);
 	}
