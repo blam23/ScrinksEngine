@@ -17,6 +17,9 @@ namespace scrinks::core
 	class Node
 	{
 	public:
+
+		DISABLE_COPY_AND_MOVE(Node);
+
 		using ID = std::size_t;
 		constexpr static ID InvalidID{ (std::numeric_limits<ID>::max)() };
 
