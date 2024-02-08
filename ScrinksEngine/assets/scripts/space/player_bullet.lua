@@ -1,10 +1,11 @@
 local screen_bound_buffer = 30
 
 velocity = vec2.new(0, -1)
-move_speed = 13
+move_speed = 16
 
 function script_added()
-    velocity = node:get_property("velocity"):normalize() or velocity
+    velocity = node:get_property("velocity") or velocity
+    velocity = velocity:normalize()
     move_speed = node:get_property("speed") or move_speed
 end
 

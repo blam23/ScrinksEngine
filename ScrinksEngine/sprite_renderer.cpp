@@ -35,7 +35,7 @@ void SpriteRenderer::init()
 
 void SpriteRenderer::setup_shader()
 {
-    static glm::vec2 scale{ 16.f, 16.f };
+    static glm::vec2 scale{ 64.f, 64.f };
 
     m_texture->bind(GL_TEXTURE0);
     m_shader->set_param("tex", 0);
@@ -54,7 +54,7 @@ void pass::SpriteRender::draw(float /*interpolate*/)
 {
     glEnable(GL_BLEND);
     glDisable(GL_CULL_FACE);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_target->bind_write();
     {
