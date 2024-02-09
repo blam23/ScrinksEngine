@@ -36,7 +36,7 @@ void Sprite::fill_sprite_data(scrinks::render::SpriteInstance& out, float interp
 
 void Sprite::setup_script_data()
 {
-	m_script_env["sprite"] = this;
+	m_script_env["self"] = this;
 
 	Node2D::setup_script_data();
 }

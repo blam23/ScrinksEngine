@@ -10,21 +10,18 @@ local arc_rotation = (-total_arc_angle/2) - math.rad(90)
 local bullet_change = 5
 local random_spread = 0.02
 
-local move_target_x = 0
-local y_height = 100
-
 function script_added()
-    local root = get_root_node()
+    local root = root_node()
     print(root)
-    game_area = root:get_property("game_area")
+    game_area = root:property("game_area")
     print(game_area)
 
-    transform:set_position(vec2.new(1920/2, 1050/2))
+    self:position(vec2.new(1920/2, 1050/2))
 end
 
 function handle_attack()
     if attack_timer:tick() then
-        local x, y = transform:get_position()
+        local x, y = self:position()
         for i = 1, bullet_count do
             local arc_factor = total_arc_angle/bullet_count * (i-0.5)
             local a = arc_factor + arc_rotation + (math.random()-0.5) * random_spread
@@ -34,8 +31,8 @@ function handle_attack()
                 x + 16 + vec.x * 20,
                 y + vec.y * 20
             )
-            bullet:set_script(bullet_script)
-            bullet:set_property("velocity", vec)
+            bullet:script(bullet_script)
+            bullet:property("velocity", vec)
         end
     end
 end
@@ -69,6 +66,6 @@ function fixed_update()
 
     if handle_input() then
         velocity = velocity:normalize()
-        transform:translate(velocity * move_speed)
+        self:translate(velocity * move_speed)
     end
 end
