@@ -3,8 +3,8 @@
 
 using namespace scrinks::core::nodes;
 
-Sprite::Sprite(Node* parent, float tileIndex, float x, float y)
-	: Node2D{ parent, { { x, y }, { 1.0f, 1.0f }, 0 } }
+Sprite::Sprite(threads::ID thread, Node* parent, float tileIndex, float x, float y)
+	: Node2D{ thread, parent, { { x, y }, { 1.0f, 1.0f }, 0 } }
 	, m_tileIndex{ tileIndex }
 {
 	scrinks::render::SpriteInstance si;
@@ -52,8 +52,11 @@ void Sprite::update_sprite_data(float interpolate)
 
 	for (const auto* sprite : s_sprites)
 	{
-		sprite->fill_sprite_data(si, interpolate);
-		Game::sprite_renderer()->update_instance(sprite->m_index, si);
+		if (sprite)
+		{
+			sprite->fill_sprite_data(si, interpolate);
+			Game::sprite_renderer()->update_instance(sprite->m_index, si);
+		}
 	}
 
 	Game::sprite_renderer()->bind_instance_data();

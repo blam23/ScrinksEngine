@@ -8,7 +8,7 @@ namespace scrinks::core::nodes
 	class Sprite : public Node2D
 	{
 	public:
-		Sprite(Node* parent, float tileIndex, float x, float y);
+		Sprite(threads::ID thread, Node* parent, float tileIndex, float x, float y);
 		virtual ~Sprite();
 
 		void set_tile_index(float tileIndex) { m_tileIndex = tileIndex; }

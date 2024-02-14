@@ -8,7 +8,7 @@ using namespace scrinks::core;
 
 void Game::init(std::string_view gameScriptPath)
 {
-	s_root = std::make_unique<nodes::Root>();
+	s_root = threads::new_node<nodes::Root>(threads::Group::Main);
 	s_root->set_script(lua::ScriptManager::load_and_store("game", gameScriptPath.data()));
 
 	s_spriteRenderer = std::make_shared<scrinks::render::SpriteRenderer>(render::TextureManager::load_and_store("mc", "D:/Assets/space/space.png"), 16, 300'000);
@@ -70,7 +70,7 @@ void Game::check_resources()
 
 void Game::shutdown()
 {
-	s_root = nullptr;
+	threads::deallocate(s_root);
 }
 
 std::pair<float, float> Game::mouse_pos()

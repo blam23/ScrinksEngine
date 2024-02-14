@@ -11,7 +11,7 @@ namespace scrinks::core::nodes
 		, public Node3D
 	{
 	public:
-		DynamicModel(Node* parent, std::shared_ptr<render::Model>, const Transform&);
+		DynamicModel(threads::ID thread, Node* parent, std::shared_ptr<render::Model>, const Transform&);
 
 		void draw(std::shared_ptr<render::Shader>, float interpolate);
 		bool& visible() { return m_visible; }

@@ -23,10 +23,12 @@ namespace scrinks::core
 		using ID = std::size_t;
 		constexpr static ID InvalidID{ (std::numeric_limits<ID>::max)() };
 
-		Node(Node* m_parent, threads::Group threadGroup = threads::Group::Split);
+		Node(threads::ID thread, Node* parent);
 		virtual ~Node();
 
 	public:
+		size_t m_allocated;
+
 		std::vector<Node*>& children() { return m_children; }
 		const std::vector<Node*>& children() const { return m_children; }
 		const char* name() const;
@@ -44,12 +46,12 @@ namespace scrinks::core
 		
 		// If you're gonna add a shit tonne of child nodes..
 		void reserve_child_nodes(size_t amount);
-		scrinks::threads::ID thread_id() const { return m_thread.m_thread_id; }
+		scrinks::threads::ID thread_id() const { return m_thread; }
 
 		template <typename T_Node, class... T_Args>
 		T_Node* new_child(T_Args... args)
 		{
-			return new T_Node(this, args...);
+			return threads::new_node<T_Node>(threads::Group::Split, this, args...);
 		}
 
 		//
@@ -90,7 +92,7 @@ namespace scrinks::core
 
 	protected:
 		sol::environment m_script_env;
-		threads::Reference m_thread;
+		threads::ID m_thread;
 
 	private:
 		bool m_marked_for_deletion;

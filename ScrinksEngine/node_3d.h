@@ -26,7 +26,7 @@ namespace scrinks::core
 	class Node3D : public Node
 	{
 	public:
-		Node3D(Node* parent, const Transform& position);
+		Node3D(threads::ID thread, Node* parent, const Transform& position);
 
 	protected:
 		virtual const std::string_view default_name() const { return "Node3D"; }

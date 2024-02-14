@@ -18,6 +18,8 @@ using namespace scrinks;
 bool exit_all_threads{ false };
 
 std::vector<std::forward_list<void*>> s_threadNodes{};
+
+
 struct AssignableThread
 {
 	DISABLE_COPY_AND_MOVE(AssignableThread);
@@ -80,28 +82,30 @@ struct AssignableThread
 
 	threads::FuncTypePtr m_func{ nullptr };
 	std::size_t m_index;
+
+	threads::ThreadAllocator m_allocator{};
 };
 
 AssignableThread* mainThread;
 AssignableThread* backgroundThread;
 std::vector<std::unique_ptr<AssignableThread>> s_threads{};
 
-void threads::register_node(Reference& thread, void* node)
+void threads::register_node(ID thread, void* node)
 {
 	// don't bother adding stuff if we're shutting down.
 	if (exit_all_threads)
 		return;
 
-	s_threadNodes[thread.m_thread_id].push_front(node);
+	s_threadNodes[thread].push_front(node);
 }
 
-void threads::unregister_node(Reference& thread, void* node)
+void threads::unregister_node(ID thread, void* node)
 {
 	// don't bother removing stuff if we're shutting down.
 	if (exit_all_threads)
 		return;
 
-	s_threadNodes[thread.m_thread_id].remove(node);
+	s_threadNodes[thread].remove(node);
 }
 
 void add_thread()
@@ -161,7 +165,7 @@ void threads::shutdown()
 
 // TODO: Realistically this should track counts and add to lowest.
 std::atomic<std::uint8_t> lastBucket{ 2 };
-std::uint8_t assign_thread(threads::Group group)
+std::uint8_t threads::assign_thread(threads::Group group)
 {
 	switch (group)
 	{
@@ -234,11 +238,11 @@ void threads::await_previous()
 }
 
 // Only call this from the game loop thread.
-void scrinks::threads::dispatch_singular_and_wait(const Reference& ref, FuncType func)
+void scrinks::threads::dispatch_singular_and_wait(ID id, FuncType func)
 {
 	assert_main_thread();
 
-	const auto& thread{ s_threads[ref.m_thread_id] };
+	const auto& thread{ s_threads[id] };
 
 	const auto f = std::make_shared<threads::FuncType>(func);
 	thread->assign(f);
@@ -249,11 +253,21 @@ void scrinks::threads::dispatch_singular_and_wait(const Reference& ref, FuncType
 	thread->m_taskComplete = false;
 }
 
-bool threads::on_my_thread(Reference& ref)
+void* scrinks::threads::allocate(ID thread, size_t size)
+{
+	return s_threads[thread]->m_allocator.allocate(size);
+}
+
+void scrinks::threads::deallocate(ID thread, void* ptr, size_t size)
+{
+	return s_threads[thread]->m_allocator.deallocate(ptr, size);
+}
+
+bool threads::on_my_thread(ID id)
 {
 	//return true;
 	auto real_thread_id{ std::this_thread::get_id() };
-	return real_thread_id == s_threads[ref.m_thread_id]->m_thread.get_id();
+	return real_thread_id == s_threads[id]->m_thread.get_id();
 }
 
 void threads::set_process_priority(Priority priority)
@@ -271,17 +285,4 @@ void threads::set_process_priority(Priority priority)
 	}
 
 	SetPriorityClass(GetCurrentProcess(), winPri);
-}
-
-// TODO: Use this for thread object count tracking
-threads::Reference::Reference(void* node, threads::Group group)
-	: m_thread_id{ assign_thread(group) }
-	, m_node { node }
-{
-	register_node(*this, node);
-}
-
-threads::Reference::~Reference()
-{
-	unregister_node(*this, m_node);
 }

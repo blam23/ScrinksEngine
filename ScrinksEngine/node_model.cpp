@@ -3,10 +3,10 @@
 using namespace scrinks::core::nodes;
 
 
-DynamicModel::DynamicModel(Node* parent, std::shared_ptr<render::Model> model, const Transform& transform)
+DynamicModel::DynamicModel(threads::ID thread, Node* parent, std::shared_ptr<render::Model> model, const Transform& transform)
 	: m_model{ model }
 	, m_visible{ true }
-	, Node3D{ parent, transform }
+	, Node3D{ thread, parent, transform }
 {
 }
 

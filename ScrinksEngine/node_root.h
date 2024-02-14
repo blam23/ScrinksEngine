@@ -1,13 +1,14 @@
 #pragma once
 
 #include "node.h"
+#include "thread_pool.h"
 
 namespace scrinks::core::nodes
 {
 	class Root : public Node
 	{
 	public:
-		Root() : Node{ nullptr } {}
+		Root(threads::ID thread) : Node{ thread, nullptr } {}
 		virtual ~Root() {}
 
 		void start_game();

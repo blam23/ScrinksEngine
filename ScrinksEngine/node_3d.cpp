@@ -3,10 +3,10 @@
 
 using namespace scrinks::core;
 
-Node3D::Node3D(Node* parent, const Transform& position)
+Node3D::Node3D(threads::ID id, Node* parent, const Transform& position)
 	: m_current{ position }
 	, m_previous{ position }
-	, Node { parent }
+	, Node { id, parent }
 {
 }
 

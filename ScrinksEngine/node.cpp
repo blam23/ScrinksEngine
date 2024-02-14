@@ -12,11 +12,11 @@ using namespace scrinks::core;
 
 std::atomic<Node::ID> Node::s_id{ 0 };
 
-Node::Node(Node* parent, threads::Group threadGroup)
+Node::Node(threads::ID id, Node* parent)
 	: m_name{}
 	, m_script{ nullptr }
 	, m_id { s_id++ }
-	, m_thread{ threads::Reference{ this, threadGroup } }
+	, m_thread{ id }
 	, m_parent{ nullptr }
 {
 	if (parent)
@@ -28,7 +28,7 @@ Node::~Node()
 	for (Node* node : m_children)
 	{
 		if (node)
-			delete node;
+			threads::deallocate(node);
 	}
 }
 
@@ -102,7 +102,7 @@ void Node::cleanup_children()
 		else if (child->m_marked_for_deletion)
 		{
 			m_children.erase(m_children.begin() + i);
-			delete child;
+			threads::deallocate(child);
 		}
 		else
 		{

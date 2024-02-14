@@ -16,7 +16,7 @@ namespace scrinks::core
 	class Node2D : public Node
 	{
 	public:
-		Node2D(Node* parent, const Transform2D& pos);
+		Node2D(threads::ID thread, Node* parent, const Transform2D& pos);
 
 	protected:
 		virtual const std::string_view default_name() const { return "Node2D"; }
