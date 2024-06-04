@@ -1,6 +1,6 @@
 #include "render_target.h"
 
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks::render;
 
@@ -21,7 +21,7 @@ scrinks::render::RenderTarget::RenderTarget(const std::string& name, BufferForma
 	}
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cerr << "Error creating Render Target." << std::endl;
+		spdlog::error("Error creating Render Target");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

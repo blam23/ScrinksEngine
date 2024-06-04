@@ -12,6 +12,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks;
 
@@ -35,7 +36,7 @@ void Window::set_capture_cursor(bool capture)
     glfwSetInputMode(s_window, GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
-void scrinks::Window::register_for_fixed_updates(FixedUpdateCallback func)
+void Window::register_for_fixed_updates(FixedUpdateCallback func)
 {
     s_fixedUpdateCallbacks.push_back(func);
 }
@@ -62,7 +63,7 @@ void print_gl_data()
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);
 
-    std::cout << "Running OpenGL " << major << "." << minor << " (" << glGetString(GL_VENDOR) << ")" << std::endl;
+    spdlog::info("Running OpenGL {}.{} ({})", major, minor, (const char*)glGetString(GL_VENDOR));
 }
 
 bool Window::setup_glfw(int width, int height, const std::string& name)
@@ -71,7 +72,7 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
 
     if (!glfwInit())
     {
-        std::cerr << "GLFW Init failed" << std::endl;
+        spdlog::error("GLFW Init failed");
         return false;
     }
 
@@ -87,13 +88,13 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
 
     if (gl3wInit())
     {
-        std::cerr << "Failed to initialise OpenGL" << std::endl;
+        spdlog::error("Failed to initialise OpenGL");
         return false;
     }
 
     if (!gl3wIsSupported(4, 3))
     {
-        std::cerr << "Required OpenGL version 4.3 is not supported on this platform." << std::endl;
+        spdlog::error("Required OpenGL version 4.3 is not supported on this platform");
         return false;
     }
 
@@ -107,41 +108,57 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
     return true;
 }
 
-void setup_pipeline()
+void Window::setup_renderer(Project::Renderer renderer)
 {
-    // todo: get this from game config data
-    render::default_pipeline();
+    if (renderer == Project::Renderer::Sprite)
+    {
+        render::default_2d_pipeline();
+    }
+    else
+    {
+        render::default_pipeline();
+    }
 }
 
-bool Window::init(int width, int height, const std::string& name)
+bool Window::init(int width, int height, const std::string& name, const std::string& projectFilePath)
 {
+    spdlog::set_pattern("%-8t %+");
+
     s_windowWidth = width;
     s_windowHeight = height;
 
     if (!setup_glfw(width, height, name))
     {
-        std::cerr << "Couldn't create OpenGL context, exiting application." << std::endl;
+        spdlog::error("Couldn't create OpenGL context, exiting application");
         exit(1);
     }
 
     if (!setup_imgui())
     {
-        std::cerr << "Failed to initialise GUI, exiting application." << std::endl;
+        spdlog::error("Failed to initialise GUI, exiting application");
         exit(2);
     }
 
     editor::init();
 
-    setup_pipeline();
+    if (!core::Game::init(projectFilePath))
+    {
+        spdlog::error("Failed to initialise game, exiting application");
+        return false;
+    }
 
-    core::Game::init("assets/scripts/game.lua");
+    threads::dispatch_async([] (void*) { lua::load_classes(); }, true);
 
     return true;
 }
 
+void Window::set_title(const std::string& title)
+{
+    glfwSetWindowTitle(s_window, title.c_str());
+}
 
-double scrinks::Window::s_lastScriptAwaitDuration{ 0 };
-void scrinks::Window::fixed_update()
+double Window::s_lastScriptAwaitDuration{ 0 };
+void Window::fixed_update()
 {
     double pre = glfwGetTime();
     threads::await_previous();
@@ -155,7 +172,7 @@ int slide = 0;
 double fixedUpdatePrev{ 0 };
 double fixedUpdateDelta{ 0 };
 int nextFixedUpdate{ 0 };
-float scrinks::Window::check_fixed_update_timer()
+float Window::check_fixed_update_timer()
 {
     std::uint16_t loops{ 0 };
     while ((glfwGetTime() * 1000) > nextFixedUpdate && loops < core::Game::MaxFrameSkip)
@@ -176,7 +193,7 @@ float scrinks::Window::check_fixed_update_timer()
     return (float)((glfwGetTime() * 1000) + core::Game::SkipRate - nextFixedUpdate) / (float)(core::Game::SkipRate);
 }
 
-double scrinks::Window::fixed_updates_per_second()
+double Window::fixed_updates_per_second()
 {
     double total = 0;
     for (double sample : avg)
@@ -185,7 +202,7 @@ double scrinks::Window::fixed_updates_per_second()
     return 1 / (total/avg.size());
 }
 
-void scrinks::Window::run_loop()
+void Window::run_loop()
 {
     while (!glfwWindowShouldClose(s_window))
     {
@@ -203,7 +220,7 @@ void scrinks::Window::run_loop()
     }
 }
 
-void scrinks::Window::shutdown()
+void Window::shutdown()
 {
     threads::shutdown();
     scrinks::core::Game::shutdown();
@@ -226,5 +243,3 @@ bool Window::is_vsync_enabled()
 {
 	return s_vsync;
 }
-
-

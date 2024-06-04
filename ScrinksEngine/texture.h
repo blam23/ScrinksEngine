@@ -1,11 +1,12 @@
 #pragma once
 
 #include "helpers.h"
+#include "gl.h"
 #include "asset.h"
+
 #include <cstdint>
 #include <string_view>
 
-#include <gl/gl3w.h>
 
 namespace scrinks::render
 {

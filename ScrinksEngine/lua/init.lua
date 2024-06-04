@@ -1,6 +1,16 @@
 local directory = "lua"
 local asset_directory = "assets/scripts"
 
+local __print = print
+print = function(...)
+    local arg={...}
+    local res = ""
+    for i,v in ipairs(arg) do
+        res = res .. tostring(v)
+    end
+    log.info(res)
+end
+
 local __require = require
 require = function(path)
     __require(directory .. "." .. path)

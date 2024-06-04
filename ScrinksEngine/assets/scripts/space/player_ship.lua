@@ -4,11 +4,13 @@ local move_speed = 7
 
 local attack_timer = timer:new(0.1)
 local bullet_script = load_script("assets/scripts/space/player_bullet.lua")
-local bullet_count = 1
-local total_arc_angle = math.rad(45   )
+local bullet_count = 2000
+local total_arc_angle = math.rad(45)
 local arc_rotation = (-total_arc_angle/2) - math.rad(90)
 local bullet_change = 5
 local random_spread = 0.02
+
+local rand_delay = 10
 
 function script_added()
     local root = root_node()
@@ -61,6 +63,11 @@ function handle_input()
 end
 
 function fixed_update()
+
+    if (rand_delay > 0) then
+        rand_delay = rand_delay - 1
+        return
+    end
 
     handle_attack()
 

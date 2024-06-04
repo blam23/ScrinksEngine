@@ -1,10 +1,9 @@
 #pragma once
 
-#include <gl/gl3w.h>
-#include <GLFW/glfw3.h>
-
+#include "gl.h"
 #include "helpers.h"
 #include "asset.h"
+#include "gl.h"
 
 namespace scrinks::render
 {

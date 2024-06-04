@@ -7,6 +7,10 @@ __props = {
     hit_enemy = false,
 }
 
+function test()
+    print("BEEP BOOP: ", __props.move_speed)
+end
+
 function fixed_update()
     self:translate(self.velocity * self.move_speed)
 

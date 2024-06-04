@@ -1,7 +1,7 @@
 #include "texture.h"
 
 #include <type_traits>
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks::render;
 
@@ -51,7 +51,7 @@ std::shared_ptr<Texture> TextureManager::load(const std::string& name, const Tex
 			dataType = GL_UNSIGNED_BYTE;
 			break;
 		default:
-			std::cerr << "Failed to load texture: '" << desc.path << "'. Unable to load unknown texture type '" << (std::uint32_t)desc.type << "'." << std::endl;
+			spdlog::error("Failed to load texture: '{}'. Unable to load unknown texture type '{}'", desc.path, (std::uint32_t)desc.type);
 			return nullptr;
 	}
 
@@ -101,7 +101,7 @@ std::shared_ptr<Texture> TextureManager::load(const std::string& name, const Tex
 	}
 	stbi_image_free(data);
 
-	std::cerr << "Failed to load texture: '" << desc.path << "'. Reason: " << stbi_failure_reason() << std::endl;
+	spdlog::error("Failed to load texture: '{}'. Reason '{}'", desc.path, stbi_failure_reason());
 	return nullptr;
 }
 

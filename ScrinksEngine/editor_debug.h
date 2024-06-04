@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include <gl/gl3w.h>
+#include "gl.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"

@@ -1,7 +1,7 @@
 #include "gbuffer.h"
 #include "glm/glm.hpp"
 #include <map>
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks::render;
 
@@ -20,7 +20,7 @@ void Buffer::bind(GLenum slot, const std::string bufferName)
 
 	if (!buffer)
 	{
-		std::cerr << "Attempt to activate null buffer '" << bufferName << "'." << std::endl;
+		spdlog::error("Attempt to activate null buffer '{}'", bufferName);
 		return;
 	}
 
@@ -98,7 +98,7 @@ void GBuffer::setup_buffers()
 	glDrawBuffers(m_colorBufferCount, attachments.data());
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cerr << "Error creating GBuffer." << std::endl;
+		spdlog::error("Error creating GBuffer");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -7,7 +7,7 @@
 
 #include <random>
 #include <glm/ext/vector_float3.hpp>
-#include <gl/gl3w.h>
+#include "gl.h"
 
 namespace scrinks::render::pass
 {

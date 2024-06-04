@@ -14,7 +14,7 @@ local y_height = 100
 -- attack stuff
 local attack_timer = timer:new(0.1)
 local bullet_count = 1
-local total_arc_angle = math.rad(45   )
+local total_arc_angle = math.rad(45)
 local arc_rotation = (-total_arc_angle/2) - math.rad(90)
 local bullet_change = 5
 local random_spread = 0.02

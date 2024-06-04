@@ -106,15 +106,15 @@ void editor::scene_tree()
 	ImGui::Begin("Scene");
 	{
 		core::Node* parentOfNew{ nullptr };
-		if (ImGui::Button("Add") && selected.size() == 1)
-		{
-			core::Node* parent{ *selected.begin() };
-			core::Node* newChild{ new core::Node{ parent } };
+		//if (ImGui::Button("Add") && selected.size() == 1)
+		//{
+		//	core::Node* parent{ *selected.begin() };
+		//	core::Node* newChild{ new core::Node{ parent } };
 
-			selected.clear();
-			selected.insert(newChild);
-			parentOfNew = parent;
-		}
+		//	selected.clear();
+		//	selected.insert(newChild);
+		//	parentOfNew = parent;
+		//}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0, 2.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0, 0.0f));

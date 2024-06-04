@@ -5,12 +5,18 @@
 #include <iostream>
 #include <vector>
 #include <forward_list>
+#include "node.h"
+#include "node_pool.h"
 
 // TODO: Linux support
+#pragma warning( push )
+#pragma warning( disable : 5105)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include "windows.h"
+#pragma warning( pop )
+
 #include <cassert>
 
 using namespace scrinks;
@@ -39,9 +45,16 @@ struct AssignableThread
 				if (exit_all_threads)
 					return;
 
-				for (auto node : s_threadNodes[m_index])
+				if (m_singularAction)
 				{
-					(*m_func)(node);
+					(*m_func)(nullptr);
+				}
+				else
+				{
+					for (auto node : s_threadNodes[m_index])
+					{
+						(*m_func)(node);
+					}
 				}
 				m_func = nullptr;
 			}
@@ -53,10 +66,11 @@ struct AssignableThread
 		} while (!exit_all_threads);
 	}
 
-	void assign(threads::FuncTypePtr func)
+	void assign(threads::FuncTypePtr func, bool singularAction = false)
 	{
 		std::lock_guard<std::mutex> waitLock { m_waitMutex };
 		m_taskComplete = false;
+		m_singularAction = singularAction;
 		m_func = func;
 		m_added.notify_all();
 	}
@@ -75,6 +89,7 @@ struct AssignableThread
 	std::condition_variable m_added;
 	std::condition_variable m_complete;
 	bool m_taskComplete{ true };
+	bool m_singularAction{ false };
 
 	std::thread m_thread;
 
@@ -85,6 +100,7 @@ struct AssignableThread
 AssignableThread* mainThread;
 AssignableThread* backgroundThread;
 std::vector<std::unique_ptr<AssignableThread>> s_threads{};
+std::vector<std::size_t> s_entityCounts{};
 
 void threads::register_node(Reference& thread, void* node)
 {
@@ -93,6 +109,7 @@ void threads::register_node(Reference& thread, void* node)
 		return;
 
 	s_threadNodes[thread.m_thread_id].push_front(node);
+	s_entityCounts[thread.m_thread_id]++;
 }
 
 void threads::unregister_node(Reference& thread, void* node)
@@ -102,12 +119,14 @@ void threads::unregister_node(Reference& thread, void* node)
 		return;
 
 	s_threadNodes[thread.m_thread_id].remove(node);
+	s_entityCounts[thread.m_thread_id]--;
 }
 
 void add_thread()
 {
 	s_threads.push_back(std::make_unique<AssignableThread>(s_threads.size()));
 	s_threadNodes.push_back({});
+	s_entityCounts.push_back(0);
 }
 
 void set_thread_priority(AssignableThread* thread, threads::Priority priority)
@@ -189,14 +208,14 @@ bool threads::on_window_thread()
 }
 
 // Only call this from the game loop thread.
-void threads::dispatch_and_wait(threads::FuncType func)
+void threads::dispatch_and_wait(threads::FuncType func, bool singularAction)
 {
 	assert_main_thread();
 
 	const auto f = std::make_shared<threads::FuncType>(func);
 
 	for (auto& thread : s_threads)
-		thread->assign(f);
+		thread->assign(f, singularAction);
 
 	for (auto& thread : s_threads)
 	{
@@ -208,14 +227,14 @@ void threads::dispatch_and_wait(threads::FuncType func)
 		thread->m_taskComplete = false;
 }
 
-void threads::dispatch_async(threads::FuncType func)
+void threads::dispatch_async(threads::FuncType func, bool singularAction)
 {
 	assert_main_thread();
 
 	const auto f = std::make_shared<threads::FuncType>(func);
 
 	for (auto& thread : s_threads)
-		thread->assign(f);
+		thread->assign(f, singularAction);
 }
 
 void threads::await_previous()
@@ -271,6 +290,15 @@ void threads::set_process_priority(Priority priority)
 	}
 
 	SetPriorityClass(GetCurrentProcess(), winPri);
+}
+
+auto scrinks::threads::get_total_entity_count() -> size_t
+{
+	size_t ret{ 0 };
+	for (const auto& count : s_entityCounts)
+		ret += count;
+
+	return ret;
 }
 
 // TODO: Use this for thread object count tracking

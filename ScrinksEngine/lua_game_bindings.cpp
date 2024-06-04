@@ -7,7 +7,7 @@
 
 using namespace scrinks;
 
-void setup_game_bindings(sol::state& env)
+static void setup_game_bindings(sol::state& env)
 {
 	env["fixed_delta"] = 1.0f / core::Game::TickRate;
 

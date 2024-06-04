@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef NODE_POOL_TEST
+
 #include "helpers.h"
 #include <array>
 
@@ -49,3 +51,5 @@ namespace scrinks::core
 		size_t m_ptr;
 	};
 }
+
+#endif

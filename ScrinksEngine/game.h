@@ -3,6 +3,7 @@
 #include "helpers.h"
 #include "window.h"
 #include "node_root.h"
+#include "project.h"
 #include "sprite_renderer.h"
 
 namespace scrinks::core
@@ -19,7 +20,7 @@ namespace scrinks::core
 		constexpr static std::uint16_t MaxFrameSkip = 5;
 
 	public:
-		static void init(std::string_view gameScriptPath);
+		static bool init(const std::string_view projectFilePath);
 		static void update(float interpolate);
 		static void sync_fixed_update();
 		static void check_resources();

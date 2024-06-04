@@ -32,6 +32,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>true</EnableASAN>
+    <EnableFuzzer>true</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -39,7 +40,8 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <EnableASAN>true</EnableASAN>
+    <EnableASAN>false</EnableASAN>
+    <EnableFuzzer>false</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -47,6 +49,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>true</EnableASAN>
+    <EnableFuzzer>true</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -54,7 +57,8 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <EnableASAN>true</EnableASAN>
+    <EnableASAN>false</EnableASAN>
+    <EnableFuzzer>false</EnableFuzzer>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -82,8 +86,11 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <DisableSpecificWarnings>5105</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -100,8 +107,11 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <DisableSpecificWarnings>5105</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,8 +128,11 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>include;luajit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <DisableSpecificWarnings>5105</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,8 +149,11 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>luajit;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <DisableSpecificWarnings>5105</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,8 +176,10 @@
     <ClCompile Include="input.cpp" />
     <ClCompile Include="instance_renderer.cpp" />
     <ClCompile Include="lua_bindings.cpp" />
+    <ClCompile Include="lua_class.cpp" />
     <ClCompile Include="lua_engine.cpp" />
     <ClCompile Include="lua_game_bindings.cpp" />
+    <ClCompile Include="lua_log_bindings.cpp" />
     <ClCompile Include="lua_resource_bindings.cpp" />
     <ClCompile Include="metadata_helpers.cpp" />
     <ClCompile Include="model.cpp" />
@@ -175,8 +193,14 @@
     <ClCompile Include="pass_environment_map.cpp" />
     <ClCompile Include="pass_sky_map.cpp" />
     <ClCompile Include="node_sprite.cpp" />
+    <ClCompile Include="project.cpp" />
     <ClCompile Include="sprite_renderer.cpp" />
-    <ClCompile Include="thread_pool.cpp" />
+    <ClCompile Include="thread_pool.cpp">
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ShowIncludes>
+    </ClCompile>
     <ClCompile Include="script.cpp" />
     <ClCompile Include="node_3d.cpp" />
     <ClCompile Include="pass_post_processing.cpp" />
@@ -204,19 +228,23 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="gbuffer.h" />
     <ClInclude Include="editor_scene_tree.h" />
+    <ClInclude Include="gl.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inspector_node3d.h" />
     <ClInclude Include="lua_bindings.h" />
+    <ClInclude Include="lua_class.h" />
     <ClInclude Include="lua_engine.h" />
     <ClInclude Include="metadata_helpers.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="node_2d.h" />
     <ClInclude Include="node_model.h" />
+    <ClInclude Include="node_pool.h" />
     <ClInclude Include="node_root.h" />
     <ClInclude Include="node_sprite.h" />
     <ClInclude Include="pass_environment_map.h" />
     <ClInclude Include="pass_sky_map.h" />
     <ClInclude Include="instance_renderer.h" />
+    <ClInclude Include="project.h" />
     <ClInclude Include="sprite_renderer.h" />
     <ClInclude Include="thread_pool.h" />
     <ClInclude Include="script.h" />
