@@ -122,7 +122,11 @@ void Window::setup_renderer(Project::Renderer renderer)
 
 bool Window::init(int width, int height, const std::string& name, const std::string& projectFilePath)
 {
-    spdlog::set_pattern("%-8t %+");
+    auto formatter = std::make_unique<spdlog::pattern_formatter>();
+    formatter->add_flag<threads::thread_pool_formatter>('*').set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%*] [%^%l%$] %v");
+    spdlog::set_formatter(std::move(formatter));
+
+    threads::setup();
 
     s_windowWidth = width;
     s_windowHeight = height;
@@ -147,7 +151,7 @@ bool Window::init(int width, int height, const std::string& name, const std::str
         return false;
     }
 
-    threads::dispatch_async([] (void*) { lua::load_classes(); }, true);
+    threads::dispatch_async([] (void*) { lua::setup(); lua::load_classes(); }, true);
 
     return true;
 }

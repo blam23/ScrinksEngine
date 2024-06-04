@@ -43,6 +43,7 @@ static void setup_game_bindings(sol::state& env)
 
 	env.new_usertype<core::nodes::Sprite>("sprite",
 		"tile_index", sol::overload(&core::nodes::Sprite::set_tile_index, &core::nodes::Sprite::get_tile_index),
+		"new", [] (float tileIdx, float x, float y) { return core::Game::root()->new_child<core::nodes::Sprite>(tileIdx, x, y); },
 		sol::base_classes, sol::bases<core::Node2D, core::Node>());
 
 	auto vec_mult_overloads = sol::overload(

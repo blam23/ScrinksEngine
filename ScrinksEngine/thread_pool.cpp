@@ -7,6 +7,7 @@
 #include <forward_list>
 #include "node.h"
 #include "node_pool.h"
+#include "spdlog/spdlog.h"
 
 // TODO: Linux support
 #pragma warning( push )
@@ -36,6 +37,10 @@ struct AssignableThread
 
 	void loop()
 	{
+		threads::CurrentThreadID = m_index < 10 ? "0" : "";
+		threads::CurrentThreadID += std::to_string(m_index);
+		
+		spdlog::info("thread {} running", m_index);
 		do
 		{
 			{
@@ -150,7 +155,8 @@ std::thread::id gameWindowThread;
 
 void threads::setup()
 {
-	auto concurrency{ std::thread::hardware_concurrency() };
+	const auto concurrency{ std::thread::hardware_concurrency() };
+	//const auto concurrency{ 4 };
 
 	add_thread();
 	add_thread();
@@ -312,4 +318,14 @@ threads::Reference::Reference(void* node, threads::Group group)
 threads::Reference::~Reference()
 {
 	unregister_node(*this, m_node);
+}
+
+void scrinks::threads::thread_pool_formatter::format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest)
+{
+	dest.append(CurrentThreadID.data(), CurrentThreadID.data() + CurrentThreadID.size());
+}
+
+std::unique_ptr<spdlog::custom_flag_formatter> scrinks::threads::thread_pool_formatter::clone() const
+{
+	return spdlog::details::make_unique<thread_pool_formatter>();
 }

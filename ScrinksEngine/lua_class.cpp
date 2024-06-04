@@ -7,6 +7,11 @@ using namespace scrinks::lua;
 
 auto Class::from_file(const std::string& path) -> std::expected<Class, std::string>
 {
+	if (!s_setup_template)
+	{
+		s_setup_template = core::TextFileManager::load_and_store("__lua_class_template", "lua/setup.template.lua");
+	}
+
 	auto script{ ScriptManager::load_and_store(path, path) };
 
 	if (!script || !script->is_loaded())
@@ -22,7 +27,7 @@ auto Class::from_file(const std::string& path) -> std::expected<Class, std::stri
 	if (classNameObj.get_type() != sol::type::string)
 		return std::unexpected{ std::format("Class did not contain '__class_name' metafield string: '{}'", script->asset_name()) };
 
-	const auto name{ classNameObj.as<std::string>() };
+	auto name{ classNameObj.as<std::string>() };
 	std::string base_node{ "node" };
 
 	sol::object baseNodeObj = classEnv["__base_node"];
@@ -33,7 +38,18 @@ auto Class::from_file(const std::string& path) -> std::expected<Class, std::stri
 	if (propsObj.get_type() != sol::type::nil && propsObj.get_type() != sol::type::table)
 		return std::unexpected{ std::format("Unknown '__props' field type (should be nil or table): {}.", static_cast<int>(propsObj.get_type())) };
 
-	return Class{ std::move(classEnv), std::move(classRes) };
+	//
+	// Apply templating to generate methods such as "new"
+	//
+
+	const std::map<std::string, std::string> params{
+		{ "%BASE_NODE%", base_node },
+		{ "%SCRIPT_PATH%", path },
+	};
+	const auto replaced{ s_setup_template->template_contents(params) };
+	lua::dbg(classEnv, replaced);
+
+	return Class{ std::move(name), std::move(classEnv) };
 }
 
 auto Class::try_run_function(const std::string& func) -> std::expected<sol::function_result, std::string>
@@ -60,8 +76,9 @@ auto Class::try_run_function(const std::string& func) -> std::expected<sol::func
 	return std::unexpected{ std::format("Failed to call <{}>, invalid environment.", func) };
 }
 
-Class::Class(sol::environment&& env, sol::function_result&& res)
-	: m_env{ std::move(env) }, m_res{ std::move(res) }
+Class::Class(std::string&& name, sol::environment&& env)
+	: m_name{ std::move(name) }
+	, m_env { std::move(env) }
 {
 }
 

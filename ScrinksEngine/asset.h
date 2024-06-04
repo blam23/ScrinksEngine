@@ -4,6 +4,7 @@
 #include <map>
 #include <functional>
 #include <string>
+#include <mutex>
 #include "helpers.h"
 
 namespace scrinks::core
@@ -53,6 +54,7 @@ namespace scrinks::core
 	protected:
 		static std::shared_ptr<T_Asset> load(const std::string& name, const T_Descriptor& description);
 		static inline std::map<std::string, std::pair<T_Descriptor, std::shared_ptr<T_Asset>>> m_store{};
+		static inline std::recursive_mutex m_loadMutex{};
 	};
 
 	template<typename T_Descriptor, typename T_Asset>
@@ -61,6 +63,8 @@ namespace scrinks::core
 		const T_Descriptor& description
 	)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		// If the asset already is loaded, return it
 		const auto itr{ m_store.find(name) };
 		if (itr != m_store.end())
@@ -87,6 +91,8 @@ namespace scrinks::core
 		const T_Descriptor& description
 	)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		mark_for_removal(name);
 		return load_and_store(name, description);
 	}
@@ -94,6 +100,8 @@ namespace scrinks::core
 	template<typename T_Descriptor, typename T_Asset>
 	std::shared_ptr<T_Asset> AssetManager<T_Descriptor, T_Asset>::reload(const std::string& name)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		const auto& idx = m_store.find(name);
 
 		if (idx != m_store.end())
@@ -115,6 +123,8 @@ namespace scrinks::core
 	template<typename T_Descriptor, typename T_Asset>
 	void AssetManager<T_Descriptor, T_Asset>::reload_all()
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		for (auto& [name, entry] : m_store)
 			reload(name);
 	}
@@ -122,6 +132,8 @@ namespace scrinks::core
 	template<typename T_Descriptor, typename T_Asset>
 	void AssetManager<T_Descriptor, T_Asset>::for_each(std::function<void(const std::string& name, std::shared_ptr<T_Asset>)> func)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		for (auto& [name, entry] : m_store)
 			func(name, entry.second);
 	}
@@ -129,6 +141,8 @@ namespace scrinks::core
 	template<typename T_Descriptor, typename T_Asset>
 	void AssetManager<T_Descriptor, T_Asset>::for_each_name(std::function<void(const std::string& name)> func)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		for (auto& [name, _] : m_store)
 			func(name);
 	}
@@ -136,6 +150,8 @@ namespace scrinks::core
 	template<typename T_Descriptor, typename T_Asset>
 	std::shared_ptr<T_Asset> AssetManager<T_Descriptor, T_Asset>::get(const std::string& name)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		const auto& idx = m_store.find(name);
 		return idx != m_store.end() ? idx->second.second : nullptr;
 	}
@@ -143,6 +159,8 @@ namespace scrinks::core
 	template<typename T_Descriptor, typename T_Asset>
 	void AssetManager<T_Descriptor, T_Asset>::mark_for_removal(const std::string& name)
 	{
+		std::lock_guard lock{ m_loadMutex };
+
 		const auto& idx = m_store.find(name);
 
 		if (idx != m_store.end())
@@ -176,15 +194,19 @@ namespace scrinks::core
 	std::shared_ptr<T_Asset> GeneratedAssetManager<T_Descriptor, T_RawAsset, T_Asset>
 		::store(const std::string& name, const T_Descriptor& description, T_RawAsset raw)
 	{
-		const auto itr{ AssetManager<T_Descriptor, T_Asset>::m_store.find(name) };
-		if (itr != AssetManager<T_Descriptor, T_Asset>::m_store.end())
+		using base = AssetManager<T_Descriptor, T_Asset>;
+
+		std::lock_guard lock{ base::m_loadMutex };
+
+		const auto itr{ base::m_store.find(name) };
+		if (itr != base::m_store.end())
 			return itr->second.second;
 
 		std::shared_ptr<T_Asset> asset{ from_raw(name, raw, description) };
 
 		if (asset && asset->is_loaded())
 		{
-			const auto [idx, success] = AssetManager<T_Descriptor, T_Asset>::m_store.try_emplace(name, std::pair(description, asset));
+			const auto [idx, success] = base::m_store.try_emplace(name, std::pair(description, asset));
 
 			if (success)
 				return idx->second.second;

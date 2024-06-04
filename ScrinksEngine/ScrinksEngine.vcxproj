@@ -195,6 +195,7 @@
     <ClCompile Include="node_sprite.cpp" />
     <ClCompile Include="project.cpp" />
     <ClCompile Include="sprite_renderer.cpp" />
+    <ClCompile Include="text_file_asset.cpp" />
     <ClCompile Include="thread_pool.cpp">
       <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ShowIncludes>
       <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ShowIncludes>
@@ -246,6 +247,7 @@
     <ClInclude Include="instance_renderer.h" />
     <ClInclude Include="project.h" />
     <ClInclude Include="sprite_renderer.h" />
+    <ClInclude Include="text_file_asset.h" />
     <ClInclude Include="thread_pool.h" />
     <ClInclude Include="script.h" />
     <ClInclude Include="node_3d.h" />

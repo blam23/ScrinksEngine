@@ -191,6 +191,9 @@
     <ClCompile Include="lua_log_bindings.cpp">
       <Filter>core\lua</Filter>
     </ClCompile>
+    <ClCompile Include="text_file_asset.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -332,6 +335,9 @@
       <Filter>core\lua\headers</Filter>
     </ClInclude>
     <ClInclude Include="gl.h">
+      <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="text_file_asset.h">
       <Filter>core\headers</Filter>
     </ClInclude>
   </ItemGroup>

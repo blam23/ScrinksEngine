@@ -1,18 +1,16 @@
 __class_name = "bullet"
-__base_node = sprite
+__base_node = "sprite"
 __props = {
     velocity = vec2.new(0,-1),
-    move_speed = 30,
+    move_speed = 400,
     hit_player = false,
     hit_enemy = false,
 }
 
-function test()
-    print("BEEP BOOP: ", __props.move_speed)
-end
+local screen_bound_buffer = 30
 
 function fixed_update()
-    self:translate(self.velocity * self.move_speed)
+    self:translate(self:property("velocity") * self:property("move_speed") * fixed_delta)
 
     local x, y = self:position()
     local w, h = view_size()
@@ -23,5 +21,3 @@ function fixed_update()
 
     -- todo: do some hit detection
 end
-
-print("bullet!: ", __class_name)

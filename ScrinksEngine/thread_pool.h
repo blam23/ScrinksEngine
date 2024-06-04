@@ -4,6 +4,7 @@
 #include <vector>
 #include <thread>
 #include <functional>
+#include "spdlog/pattern_formatter.h"
 
 //
 // The way this threading model works is a bit funky!
@@ -52,6 +53,7 @@ namespace scrinks::threads
 
 	constexpr uint8_t MainThreadID = 0;
 	constexpr uint8_t BackgroundThreadID = 1;
+	static inline thread_local std::string CurrentThreadID{ "ma" };
 
 	void register_node(Reference& thread, void* node);
 	void unregister_node(Reference& thread, void* node);
@@ -69,5 +71,12 @@ namespace scrinks::threads
 	void shutdown();
 	void set_process_priority(Priority);
 	auto get_total_entity_count() -> size_t;
+
+	class thread_pool_formatter : public spdlog::custom_flag_formatter
+	{
+	public:
+		void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest);
+		std::unique_ptr<custom_flag_formatter> clone() const override;
+	};
 }
 

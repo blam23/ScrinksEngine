@@ -21,13 +21,15 @@ scrinks::core::Node* currentNode{ nullptr };
 
 static bool load_class(const std::string& path)
 {
+	spdlog::info("loading {}..", path);
+
 	auto result{ Class::from_file(path) };
 	const auto ret{ result.has_value() };
 
 	if (ret)
 	{
 		auto& c{ result.value() };
-		c.try_run_function("test");
+		mainState["_G"][c.name()] = c.env();
 	}
 	else
 	{
@@ -41,6 +43,7 @@ std::mutex load_mutex{};
 auto scrinks::lua::load_classes() -> bool
 {
 	std::lock_guard lock{ load_mutex };
+	spdlog::info("loading classes..");
 	for (const auto& path : registeredClasses)
 	{
 		bool loaded{ load_class(path) };
@@ -84,7 +87,7 @@ sol::environment scrinks::lua::create_env()
 	if (!attemptedSetup)
 		setup();
 
-	return { mainState, sol::create, mainState["_G"].tbl };
+	return { mainState, sol::create, mainState.globals() };
 }
 
 sol::load_result scrinks::lua::load(const std::string& code, const std::string& file)
