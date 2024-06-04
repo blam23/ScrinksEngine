@@ -11,8 +11,8 @@ bool bindings::register_binding(std::function<void(sol::state&)> func)
 	return true;
 }
 	
-void bindings::setup_all(sol::state& env)
+void bindings::setup_all(sol::state& state)
 {
 	for (const auto& bind : binds)
-		bind(env);
+		bind(state);
 }

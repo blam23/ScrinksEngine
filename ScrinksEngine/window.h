@@ -4,8 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include <gl/gl3w.h>
-#include <GLFW/glfw3.h>
+#include "gl.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -13,6 +12,7 @@
 
 #include "gbuffer.h"
 #include "camera.h"
+#include "project.h"
 
 namespace scrinks
 {
@@ -21,7 +21,9 @@ namespace scrinks
 	public:
 		using FixedUpdateCallback = std::function<void()>;
 
-		static bool init(int width, int height, const std::string& name);
+		static bool init(int width, int height, const std::string& name, const std::string& projectFilePath);
+		static void set_title(const std::string& title);
+		static void setup_renderer(Project::Renderer renderer);
 		static void shutdown();
 		static void run_loop();
 		static void set_vsync(bool enabled);

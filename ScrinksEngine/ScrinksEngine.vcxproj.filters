@@ -182,6 +182,18 @@
     <ClCompile Include="sprite_renderer.cpp">
       <Filter>render</Filter>
     </ClCompile>
+    <ClCompile Include="project.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_class.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_log_bindings.cpp">
+      <Filter>core\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="text_file_asset.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -312,6 +324,21 @@
     </ClInclude>
     <ClInclude Include="lua_bindings.h">
       <Filter>core\lua\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="project.h">
+      <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_pool.h">
+      <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="lua_class.h">
+      <Filter>core\lua\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="gl.h">
+      <Filter>core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="text_file_asset.h">
+      <Filter>core\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

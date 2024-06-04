@@ -1,10 +1,11 @@
 #pragma once
 
 #include "errors.h"
+#include "spdlog/spdlog.h"
 
 void scrinks::errors::glfw_error_callback(int error, const char* description)
 {
-    std::cerr << "GLFW Error " << error << ": " << description;
+    spdlog::error("GLFW Error {}: {}", error, description);
 }
 
 GLuint lastId{ 0 };
@@ -51,5 +52,5 @@ void APIENTRY scrinks::errors::gl_print_error_callback(
     case GL_DEBUG_SEVERITY_NOTIFICATION: severity = "note"; break;
     }
 
-    std::cerr << "[" << severity << "][" << id << "][" << type << "][" << source << "]: " << message << std::endl;
+    spdlog::error("[{}][{}][{}][{}]: {}", severity, id, type, source, message);
 }

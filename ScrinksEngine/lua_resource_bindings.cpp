@@ -4,7 +4,7 @@
 
 using namespace scrinks;
 
-void setup_resource_bindings(sol::state& env)
+static void setup_resource_bindings(sol::state& env)
 {
 	env["load_script"]
 		= [] (const std::string& name) { return lua::ScriptManager::load_and_store(name, name); };

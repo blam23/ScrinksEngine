@@ -12,8 +12,7 @@ Node2D::Node2D(Node* parent, const Transform2D& position)
 
 void scrinks::core::Node2D::setup_script_data()
 {
-	m_script_env["transform"] = this;
-
+	m_script_env["self"] = this;
 	Node::setup_script_data();
 }
 

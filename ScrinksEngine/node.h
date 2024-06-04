@@ -26,6 +26,8 @@ namespace scrinks::core
 		Node(Node* m_parent, threads::Group threadGroup = threads::Group::Split);
 		virtual ~Node();
 
+		constexpr static Node get_empty();
+
 	public:
 		std::vector<Node*>& children() { return m_children; }
 		const std::vector<Node*>& children() const { return m_children; }
@@ -46,12 +48,26 @@ namespace scrinks::core
 		void reserve_child_nodes(size_t amount);
 		scrinks::threads::ID thread_id() const { return m_thread.m_thread_id; }
 
-		template <typename T_Node, class... T_Args>
-		T_Node* new_child(T_Args... args)
+		template <
+			typename T_Node,
+			class... T_Args,
+			typename = std::enable_if_t<std::is_base_of<Node, T_Node>::value>
+		>
+		T_Node* new_child(T_Args&&... args)
 		{
-			return new T_Node(this, args...);
+			return new T_Node(this, std::forward<T_Args>(args)...);
 		}
 
+		template <typename T>
+		std::vector<T*> get_children_of_type() {
+			std::vector<T*> result;
+			for (auto& child : m_children) {
+				if (dynamic_cast<T*>(child) != nullptr) {
+					result.push_back(static_cast<T*>(child));
+				}
+			}
+			return result;
+		}
 		//
 		// EVENTS
 		//

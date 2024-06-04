@@ -7,6 +7,7 @@
 #include <thread>
 #include "metadata_helpers.h"
 #include <glm/gtx/string_cast.hpp>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks::core;
 
@@ -59,7 +60,7 @@ void Node::run_func_checked(const std::string& func)
 			if (!res.valid())
 			{
 				sol::error msg = res;
-					std::cerr << "Error calling func <" << func << ">, error: " << msg.what() << std::endl;
+				spdlog::error("Error calling func <{}>, error: {}", func, msg.what());
 			}
 		}
 	}
@@ -175,7 +176,7 @@ void Node::load_script()
 	if (!res.valid())
 	{
 		sol::error err = res;
-		std::cerr << "Failed to set script: " << err.what() << std::endl;
+		spdlog::error("Failed to set script: {}", err.what());
 	}
 
 	setup_script_data();
@@ -253,9 +254,6 @@ sol::object Node::get_property(const std::string& name)
 void Node::setup_script_data()
 {
 	m_script_env["node"] = this;
-
-	m_script_env["name"]
-		= [this] () { return name(); };
 }
 
 void Node::claim_child(Node& node)
@@ -268,15 +266,10 @@ void Node::claim_child(Node& node)
 	node.attached();
 }
 
-void Node::disown_child(Node& node)
+void Node::disown_child(Node& child)
 {
-	for (auto it = m_children.begin(); it != m_children.end(); it++)
-	{
-		if (*it == &node)
-		{
-			(*it)->removed();
-			m_children.erase(it);
-			break;
-		}
+	auto it = std::find(m_children.begin(), m_children.end(), &child);
+	if (it != m_children.end()) {
+		m_children.erase(it);
 	}
 }

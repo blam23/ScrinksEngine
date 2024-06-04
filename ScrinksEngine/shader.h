@@ -1,7 +1,6 @@
 #pragma once
 
-#include <gl/gl3w.h>
-
+#include "gl.h"
 #include "helpers.h"
 #include "asset.h"
 

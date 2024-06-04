@@ -4,6 +4,7 @@
 #include <vector>
 #include <thread>
 #include <functional>
+#include "spdlog/pattern_formatter.h"
 
 //
 // The way this threading model works is a bit funky!
@@ -21,6 +22,7 @@ namespace scrinks::threads
 
 	enum class Group
 	{
+		None,           // Invalid
 		Main,           // High priority, single <main> thread
 		Background,     // Low priority, single <background> thread
 		Split,          // Split among pooled threads
@@ -47,8 +49,11 @@ namespace scrinks::threads
 		void* m_node;
 	};
 
+	//consteval static Reference INAVLID_REFERENCE{ nullptr, Group::None };
+
 	constexpr uint8_t MainThreadID = 0;
 	constexpr uint8_t BackgroundThreadID = 1;
+	static inline thread_local std::string CurrentThreadID{ "ma" };
 
 	void register_node(Reference& thread, void* node);
 	void unregister_node(Reference& thread, void* node);
@@ -58,12 +63,20 @@ namespace scrinks::threads
 	using FuncType = std::function<void(void*)>;
 	using FuncTypePtr = std::shared_ptr<FuncType>;
 	bool on_window_thread();
-	void dispatch_and_wait(FuncType func);
-	void dispatch_async(FuncType func); // TODO: return event to wait for if you need to sync?
+	void dispatch_and_wait(FuncType func, bool singularAction = false);
+	void dispatch_async(FuncType func, bool singularAction = false);
 	void await_previous();
 	void dispatch_singular_and_wait(const Reference& thread, FuncType func);
 	void setup();
 	void shutdown();
 	void set_process_priority(Priority);
+	auto get_total_entity_count() -> size_t;
+
+	class thread_pool_formatter : public spdlog::custom_flag_formatter
+	{
+	public:
+		void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest);
+		std::unique_ptr<custom_flag_formatter> clone() const override;
+	};
 }
 

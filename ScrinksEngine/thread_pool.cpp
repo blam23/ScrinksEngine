@@ -5,12 +5,19 @@
 #include <iostream>
 #include <vector>
 #include <forward_list>
+#include "node.h"
+#include "node_pool.h"
+#include "spdlog/spdlog.h"
 
 // TODO: Linux support
+#pragma warning( push )
+#pragma warning( disable : 5105)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include "windows.h"
+#pragma warning( pop )
+
 #include <cassert>
 
 using namespace scrinks;
@@ -30,6 +37,10 @@ struct AssignableThread
 
 	void loop()
 	{
+		threads::CurrentThreadID = m_index < 10 ? "0" : "";
+		threads::CurrentThreadID += std::to_string(m_index);
+		
+		spdlog::info("thread {} running", m_index);
 		do
 		{
 			{
@@ -39,9 +50,16 @@ struct AssignableThread
 				if (exit_all_threads)
 					return;
 
-				for (auto node : s_threadNodes[m_index])
+				if (m_singularAction)
 				{
-					(*m_func)(node);
+					(*m_func)(nullptr);
+				}
+				else
+				{
+					for (auto node : s_threadNodes[m_index])
+					{
+						(*m_func)(node);
+					}
 				}
 				m_func = nullptr;
 			}
@@ -53,10 +71,11 @@ struct AssignableThread
 		} while (!exit_all_threads);
 	}
 
-	void assign(threads::FuncTypePtr func)
+	void assign(threads::FuncTypePtr func, bool singularAction = false)
 	{
 		std::lock_guard<std::mutex> waitLock { m_waitMutex };
 		m_taskComplete = false;
+		m_singularAction = singularAction;
 		m_func = func;
 		m_added.notify_all();
 	}
@@ -75,6 +94,7 @@ struct AssignableThread
 	std::condition_variable m_added;
 	std::condition_variable m_complete;
 	bool m_taskComplete{ true };
+	bool m_singularAction{ false };
 
 	std::thread m_thread;
 
@@ -85,6 +105,7 @@ struct AssignableThread
 AssignableThread* mainThread;
 AssignableThread* backgroundThread;
 std::vector<std::unique_ptr<AssignableThread>> s_threads{};
+std::vector<std::size_t> s_entityCounts{};
 
 void threads::register_node(Reference& thread, void* node)
 {
@@ -93,6 +114,7 @@ void threads::register_node(Reference& thread, void* node)
 		return;
 
 	s_threadNodes[thread.m_thread_id].push_front(node);
+	s_entityCounts[thread.m_thread_id]++;
 }
 
 void threads::unregister_node(Reference& thread, void* node)
@@ -102,12 +124,14 @@ void threads::unregister_node(Reference& thread, void* node)
 		return;
 
 	s_threadNodes[thread.m_thread_id].remove(node);
+	s_entityCounts[thread.m_thread_id]--;
 }
 
 void add_thread()
 {
 	s_threads.push_back(std::make_unique<AssignableThread>(s_threads.size()));
 	s_threadNodes.push_back({});
+	s_entityCounts.push_back(0);
 }
 
 void set_thread_priority(AssignableThread* thread, threads::Priority priority)
@@ -131,7 +155,8 @@ std::thread::id gameWindowThread;
 
 void threads::setup()
 {
-	auto concurrency{ std::thread::hardware_concurrency() };
+	const auto concurrency{ std::thread::hardware_concurrency() };
+	//const auto concurrency{ 4 };
 
 	add_thread();
 	add_thread();
@@ -189,14 +214,14 @@ bool threads::on_window_thread()
 }
 
 // Only call this from the game loop thread.
-void threads::dispatch_and_wait(threads::FuncType func)
+void threads::dispatch_and_wait(threads::FuncType func, bool singularAction)
 {
 	assert_main_thread();
 
 	const auto f = std::make_shared<threads::FuncType>(func);
 
 	for (auto& thread : s_threads)
-		thread->assign(f);
+		thread->assign(f, singularAction);
 
 	for (auto& thread : s_threads)
 	{
@@ -208,14 +233,14 @@ void threads::dispatch_and_wait(threads::FuncType func)
 		thread->m_taskComplete = false;
 }
 
-void threads::dispatch_async(threads::FuncType func)
+void threads::dispatch_async(threads::FuncType func, bool singularAction)
 {
 	assert_main_thread();
 
 	const auto f = std::make_shared<threads::FuncType>(func);
 
 	for (auto& thread : s_threads)
-		thread->assign(f);
+		thread->assign(f, singularAction);
 }
 
 void threads::await_previous()
@@ -273,6 +298,15 @@ void threads::set_process_priority(Priority priority)
 	SetPriorityClass(GetCurrentProcess(), winPri);
 }
 
+auto scrinks::threads::get_total_entity_count() -> size_t
+{
+	size_t ret{ 0 };
+	for (const auto& count : s_entityCounts)
+		ret += count;
+
+	return ret;
+}
+
 // TODO: Use this for thread object count tracking
 threads::Reference::Reference(void* node, threads::Group group)
 	: m_thread_id{ assign_thread(group) }
@@ -284,4 +318,14 @@ threads::Reference::Reference(void* node, threads::Group group)
 threads::Reference::~Reference()
 {
 	unregister_node(*this, m_node);
+}
+
+void scrinks::threads::thread_pool_formatter::format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest)
+{
+	dest.append(CurrentThreadID.data(), CurrentThreadID.data() + CurrentThreadID.size());
+}
+
+std::unique_ptr<spdlog::custom_flag_formatter> scrinks::threads::thread_pool_formatter::clone() const
+{
+	return spdlog::details::make_unique<thread_pool_formatter>();
 }

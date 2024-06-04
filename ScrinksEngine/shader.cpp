@@ -7,7 +7,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#include <iostream>
+#include "spdlog/spdlog.h"
 #include <fstream>
 #include <sstream>
 #include <array>
@@ -27,7 +27,7 @@ GLuint compile_shader(const char* code, GLenum type)
 	{
 		char log[512];
 		glGetShaderInfoLog(shader, 512, nullptr, log);
-		std::cerr << "Error compiling shader: '" << log << "'." << std::endl;
+		spdlog::error("Error compiling shader: '{}'", log);
 	}
 
 	return shader;
@@ -50,7 +50,7 @@ Shader::Shader(Badge<ShaderManager>, const std::string& name, const std::string&
 	{
 		char log[512];
 		glGetProgramInfoLog(m_id, 512, nullptr, log);
-		std::cerr << "Error linking shader: '" << log << "'." << std::endl;
+		spdlog::error("Error linking shader: '{}'", log);
 	}
 
 	m_loaded = true;
@@ -95,7 +95,7 @@ std::shared_ptr<Shader> ShaderManager::load(const std::string& name, const Shade
 	}
 	catch (const std::ifstream::failure& error)
 	{
-		std::cerr << "Error loading shader <" << description.vertexPath << "," << description.fragmentPath << ">: '" << error.what() << "'." << std::endl;
+		spdlog::error("Error loading shader <{},{}>: '{}'", description.vertexPath, description.fragmentPath, error.what());
 	}
 
 	return nullptr;
@@ -108,7 +108,7 @@ void Shader::use_program()
 
 #ifdef DEBUG
 	if (m_outdated)
-		std::cerr << "Using outdated shader program." << std::endl;
+		spdlog::error("Using outdated shader program");
 #endif
 }
 

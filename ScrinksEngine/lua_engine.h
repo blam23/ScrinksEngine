@@ -17,11 +17,16 @@ namespace scrinks::lua
 
 	sol::environment create_env();
 	sol::load_result load(const std::string& code, const std::string& file);
+
+	auto register_class(const std::string& file) -> void;
+	auto load_classes() -> bool;
+
 	void dbg(sol::environment& env, const std::string& code);
 	void dbg_print_globals(sol::environment& env);
 
 	sol::object copy_object(const sol::object&, sol::state& to);
 	SharedID send_to_shared(const sol::object&);
 	sol::object get_from_shared(SharedID);
+
 }
 

@@ -1,8 +1,7 @@
 #include "script.h"
 #include "lua_engine.h"
 #include <fstream>
-#include <sstream>
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks::lua;
 
@@ -20,7 +19,7 @@ Script::Script(Badge<ScriptManager>, const std::string& name, const std::string&
 	else
 	{
 		sol::error err = res;
-		std::cerr << "Failed to load script: " << err.what() << std::endl;
+		spdlog::error("Failed to load script: {}", err.what());
 	}
 }
 
@@ -65,7 +64,7 @@ std::shared_ptr<Script> ScriptManager::load(const std::string& name, const Scrip
 	}
 	catch (const std::ifstream::failure& error)
 	{
-		std::cerr << "Error loading script <" << description << ">: '" << error.what() << "'." << std::endl;
+		spdlog::error("Error loading script <{}>: {}", description, error.what());
 	}
 
 	return nullptr;

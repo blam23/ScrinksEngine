@@ -1,6 +1,6 @@
 #include "model.h"
 
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 #undef min
 #undef max
@@ -43,7 +43,7 @@ void load_textures_from_material
 			textures.push_back(texture);
 		else
 		{
-			std::cerr << "Error loading model, unable to load texture: '" << fullPath << "'." << std::endl;
+			spdlog::error("Error loading model, unable to load texture: '{}'", fullPath);
 		}
 	}
 }
@@ -109,7 +109,7 @@ std::shared_ptr<Model> ModelManager::load(const std::string& name, const ModelDe
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		std::cerr << "Error importing model: " << importer.GetErrorString() << std::endl;
+		spdlog::error("Error importing model: '{}'", importer.GetErrorString());
 		return {};
 	}
 

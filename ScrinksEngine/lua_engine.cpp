@@ -1,18 +1,58 @@
 #include "lua_engine.h"
 #include "lua_bindings.h"
+#include "lua_class.h"
 #include "window.h"
 #include "game.h"
 #include "node.h"
 
 #include <iostream>
 #include <mutex>
+#include <list>
+#include "spdlog/spdlog.h"
 
 using namespace scrinks::lua;
 
 thread_local sol::state mainState;
 thread_local bool attemptedSetup;
 
+std::list<std::string> registeredClasses{};
+
 scrinks::core::Node* currentNode{ nullptr };
+
+static bool load_class(const std::string& path)
+{
+	spdlog::info("loading {}..", path);
+
+	auto result{ Class::from_file(path) };
+	const auto ret{ result.has_value() };
+
+	if (ret)
+	{
+		auto& c{ result.value() };
+		mainState["_G"][c.name()] = c.env();
+	}
+	else
+	{
+		spdlog::warn("Failed to load class from file: '{}', error: {}", path, result.error());
+	}
+
+	return ret;
+}
+
+std::mutex load_mutex{};
+auto scrinks::lua::load_classes() -> bool
+{
+	std::lock_guard lock{ load_mutex };
+	spdlog::info("loading classes..");
+	for (const auto& path : registeredClasses)
+	{
+		bool loaded{ load_class(path) };
+		if (!loaded)
+			return false;
+	}
+
+	return true;
+}
 
 void scrinks::lua::setup()
 {
@@ -30,11 +70,11 @@ void scrinks::lua::setup()
 	if (!res.valid())
 	{
 		sol::error err = res;
-		std::cerr << "Failed to load init script: " << err.what() << std::endl;
+		spdlog::error("Failed to load init script", err.what());
 	}
 	else
 	{
-		std::cerr << "Loaded lua!" << std::endl;
+		spdlog::info("Loaded lua!");
 	}
 
 	bindings::setup_all(mainState);
@@ -47,7 +87,7 @@ sol::environment scrinks::lua::create_env()
 	if (!attemptedSetup)
 		setup();
 
-	return { mainState, sol::create, mainState["_G"].tbl };
+	return { mainState, sol::create, mainState.globals() };
 }
 
 sol::load_result scrinks::lua::load(const std::string& code, const std::string& file)
@@ -107,8 +147,11 @@ sol::object scrinks::lua::copy_object(const sol::object& in, sol::state& to)
 		default:
 			return {};
 	}
+}
 
-	
+auto scrinks::lua::register_class(const std::string& path) -> void
+{
+	registeredClasses.push_back(path);
 }
 
 //

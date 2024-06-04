@@ -96,8 +96,8 @@ void menu()
             core::Game::check_resources();
         }
 
-        ImGui::SameLine(ImGui::GetWindowWidth() - 295);
-        ImGui::TextColored(vsyncEnabled ? info_regular : info_highlight, "%.3f ms/frame (%.1f FPS) [%.1f fixed]", 1000.0f / io.Framerate, io.Framerate, Window::fixed_updates_per_second());
+        ImGui::SameLine(ImGui::GetWindowWidth() - 425);
+        ImGui::TextColored(vsyncEnabled ? info_regular : info_highlight, "%.3f ms/frame (%.1f FPS) [%.1f fixed] [%06u entitites]", 1000.0f / io.Framerate, io.Framerate, Window::fixed_updates_per_second(), threads::get_total_entity_count());
     }
     ImGui::EndMainMenuBar();
 }

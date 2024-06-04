@@ -7,14 +7,14 @@
 
 using namespace scrinks;
 
-void setup_game_bindings(sol::state& env)
+static void setup_game_bindings(sol::state& env)
 {
 	env["fixed_delta"] = 1.0f / core::Game::TickRate;
 
-	env["get_mouse_position"]
+	env["mouse_position"]
 		= [] () { return core::Game::mouse_pos(); };
 
-	env["get_view_size"]
+	env["view_size"]
 		= [] () { return std::pair(render::Pipeline::view_width(), render::Pipeline::view_height()); };
 
 	env["is_key_down"]
@@ -26,25 +26,24 @@ void setup_game_bindings(sol::state& env)
 	env["create_sprite_node"]
 		= [] (float tileIdx, float x, float y) { return core::Game::root()->new_child<core::nodes::Sprite>(tileIdx, x, y); };
 
-	env["get_root_node"]
+	env["root_node"]
 		= [] () { return (core::Node*)core::Game::root(); };
 
 	env.new_usertype<core::Node>("base",
 		"rename", &core::Node::rename,
-		"set_script", &core::Node::set_script,
+		"script", &core::Node::set_script,
 		"set_and_load_script", &core::Node::set_and_load_script,
-		"set_property", &core::Node::set_property,
-		"get_property", &core::Node::get_property,
+		"property", sol::overload(& core::Node::set_property, &core::Node::get_property),
 		"mark_for_deletion", &core::Node::mark_for_deletion);
 
 	env.new_usertype<core::Node2D>("node2D",
-		"set_position", &core::Node2D::set_position,
-		"get_position", &core::Node2D::get_position,
+		"position", sol::overload(&core::Node2D::set_position, &core::Node2D::get_position),
 		"translate", &core::Node2D::translate,
 		sol::base_classes, sol::bases<core::Node>());
 
 	env.new_usertype<core::nodes::Sprite>("sprite",
-		"set_tile_index", &core::nodes::Sprite::set_tile_index,
+		"tile_index", sol::overload(&core::nodes::Sprite::set_tile_index, &core::nodes::Sprite::get_tile_index),
+		"new", [] (float tileIdx, float x, float y) { return core::Game::root()->new_child<core::nodes::Sprite>(tileIdx, x, y); },
 		sol::base_classes, sol::bases<core::Node2D, core::Node>());
 
 	auto vec_mult_overloads = sol::overload(

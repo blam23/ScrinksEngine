@@ -26,7 +26,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/gl3w.h>
+#pragma warning( push )
+#pragma warning( disable : 5105)
+#include <gl/gl3w.h>
+#pragma warning( pop )
 #include <stdlib.h>
 
 #define ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
