@@ -110,7 +110,7 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
 void setup_pipeline()
 {
     // todo: get this from game config data
-    render::default_2d_pipeline();
+    render::default_pipeline();
 }
 
 bool Window::init(int width, int height, const std::string& name)

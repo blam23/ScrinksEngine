@@ -152,7 +152,7 @@ void editor::scene_tree()
 
 	ImGui::Begin("Inspector");
 	{
-		if (selected.size() == 1)
+		if (selected.size() == 1 && *selected.begin() != nullptr)
 		{
 			static std::string nameInput;
 
