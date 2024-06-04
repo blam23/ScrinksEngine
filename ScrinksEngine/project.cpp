@@ -2,6 +2,7 @@
 #include "script.h"
 #include "lua_engine.h"
 #include "spdlog/spdlog.h"
+#include "node.h"
 
 using namespace scrinks;
 
@@ -39,6 +40,14 @@ std::optional<Project> Project::from_file(const std::string_view projectFileName
 		
 		auto path = script.second.as<std::string>();
 		lua::register_class(path);
+	}
+
+	sol::table groups = env["groups"];
+	for (const auto& group : groups)
+	{
+		TRUE_OR_FAIL(group.second.get_type() == sol::type::string, "Unable to register group, unknown type (expected name as string).");
+		auto gn = group.second.as<std::string>();
+		scrinks::core::Node::add_group(gn);
 	}
 
 	return Project {

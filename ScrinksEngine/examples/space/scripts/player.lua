@@ -14,7 +14,7 @@ local y_height = 100
 -- attack stuff
 local attack_timer = timer:new(0.1)
 local bullet_count = 4
-local total_arc_angle = math.rad(30)
+local total_arc_angle = math.rad(10)
 local arc_rotation = (-total_arc_angle/2) - math.rad(90)
 local bullet_change = 5
 local random_spread = 0.02
@@ -40,13 +40,13 @@ function handle_attack()
             --     hit_enemy = true
             -- })
 
-            local bullet = bullet.new(
-                17,
-                x + 8 + vec.x * 20,
-                y + vec.y * 20)
+            local projectile = bullet.new(
+                16,
+                x + 12 + vec.x * 10,
+                y + vec.y * 10)
             
-            bullet:property("move_speed", math.random() * 400 + 500)
-            bullet:property("velocity", vec)
+            projectile:property("move_speed", math.random() * 400 + 500)
+            projectile:property("velocity", vec)
         end
     end
 end

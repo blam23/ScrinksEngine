@@ -37,6 +37,7 @@ namespace scrinks::core
 		void rename(const std::string& name) { m_name = name; }
 		void mark_for_deletion();
 		void mark_for_child_cleanup();
+		void add_to_group(const std::string& group);
 		
 		void set_script(std::shared_ptr<lua::Script> script);
 		void set_and_load_script(std::shared_ptr<lua::Script> script);
@@ -89,6 +90,29 @@ namespace scrinks::core
 	public:
 		static void dispatch_fixed_update(void* node) { ((Node*)node)->fixed_update(); }
 
+		// TODO: This whole group system is terrible, fix.
+		static void add_group(const std::string& name);
+		static const std::vector<Node*>& get_nodes_in_group(const std::string& name);
+
+		template <typename T_NODE>
+		static const std::vector<T_NODE*> get_typed_nodes_in_group(const std::string& name)
+		{
+			std::lock_guard lock{ s_group_mutex };
+
+			//todo: ewwww
+			std::vector<T_NODE*> ret{};
+
+			for (const auto node : get_nodes_in_group(name))
+			{
+				if (const auto n = dynamic_cast<T_NODE*>(node); n)
+				{
+					ret.push_back(n);
+				}
+			}
+
+			return ret;
+		}
+
 	protected:
 		virtual const std::string_view default_name() const { return "Node"; }
 		void run_func_checked(const std::string& func);
@@ -116,6 +140,7 @@ namespace scrinks::core
 		std::vector<Node*> m_children;
 		std::shared_ptr<lua::Script> m_script;
 		std::string m_name;
+		std::uint16_t m_group{ 0 };
 		ID m_id;
 		bool m_init_lua;
 		bool m_has_fixed_update{ false };
@@ -124,5 +149,9 @@ namespace scrinks::core
 		std::map<std::string, lua::SharedID> m_shared;
 
 		static std::atomic<ID> s_id;
+
+		static inline std::mutex s_group_mutex{};
+		static inline std::vector<std::vector<Node*>> s_groups{ {} };
+		static inline std::map<std::string, std::uint16_t> s_group_names{};
 	};
 };

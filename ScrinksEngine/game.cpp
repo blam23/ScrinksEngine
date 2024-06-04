@@ -23,7 +23,7 @@ bool Game::init(const std::string_view projectFilePath)
 	lua::load_classes();
 	s_root->set_script(project->entry_script());
 
-	s_spriteRenderer = std::make_shared<scrinks::render::SpriteRenderer>(render::TextureManager::load_and_store("mc", "assets/textures/space.png"), 16, 300'000);
+	s_spriteRenderer = std::make_shared<scrinks::render::SpriteRenderer>(render::TextureManager::load_and_store("mc", "examples/space/textures/space.png"), 16, 300'000);
 	s_spriteRenderer->init();
 
 	auto sr = scrinks::render::Pipeline::get_pass<scrinks::render::pass::SpriteRender>("sprite_renderer");

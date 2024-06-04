@@ -29,10 +29,14 @@ static void setup_game_bindings(sol::state& env)
 	env["root_node"]
 		= [] () { return (core::Node*)core::Game::root(); };
 
+	env["get_nodes_in_group"]
+		= [] (const std::string& group) { return core::Node::get_typed_nodes_in_group<core::Node2D>(group); };
+
 	env.new_usertype<core::Node>("base",
 		"rename", &core::Node::rename,
 		"script", &core::Node::set_script,
 		"set_and_load_script", &core::Node::set_and_load_script,
+		"add_to_group", &core::Node::add_to_group,
 		"property", sol::overload(& core::Node::set_property, &core::Node::get_property),
 		"mark_for_deletion", &core::Node::mark_for_deletion);
 

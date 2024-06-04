@@ -26,6 +26,12 @@ Node::Node(Node* parent, threads::Group threadGroup)
 
 Node::~Node()
 {
+	if (m_group != 0)
+	{
+		std::lock_guard lock{ s_group_mutex };
+		s_groups[m_group].erase(std::find(s_groups[m_group].begin(), s_groups[m_group].end(), this));
+	}
+
 	for (Node* node : m_children)
 	{
 		if (node)
@@ -46,6 +52,18 @@ const char* Node::type() const
 void Node::reserve_child_nodes(size_t amount)
 {
 	m_children.reserve(amount);
+}
+
+void Node::add_group(const std::string& name)
+{
+	std::lock_guard lock{ s_group_mutex };
+	s_group_names[name] = (uint16_t)s_groups.size();
+	s_groups.push_back({});
+}
+
+const std::vector<Node*>& scrinks::core::Node::get_nodes_in_group(const std::string& name)
+{
+	return s_groups[s_group_names[name]];
 }
 
 void Node::run_func_checked(const std::string& func)
@@ -152,7 +170,7 @@ void Node::sync_fixed_update()
 	}
 }
 
-void scrinks::core::Node::mark_for_child_cleanup()
+void Node::mark_for_child_cleanup()
 {
 	m_requires_cleanup = true;
 
@@ -160,8 +178,15 @@ void scrinks::core::Node::mark_for_child_cleanup()
 		m_parent->mark_for_child_cleanup();
 }
 
+void Node::add_to_group(const std::string& group)
+{
+	std::lock_guard lock{ s_group_mutex };
+	m_group = s_group_names[group];
+	s_groups[m_group].push_back(this);
+}
 
-void scrinks::core::Node::mark_for_deletion()
+
+void Node::mark_for_deletion()
 {
 	m_marked_for_deletion = true;
 
