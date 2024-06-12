@@ -3,6 +3,7 @@
 #include "pipeline.h"
 #include "window.h"
 #include "node_sprite.h"
+#include "node_2d_quadtree.h"
 #include "glm/gtx/string_cast.hpp"
 
 using namespace scrinks;
@@ -30,11 +31,19 @@ static void setup_game_bindings(sol::state& env)
 		= [] () { return (core::Node*)core::Game::root(); };
 
 	env["get_nodes_in_group"]
-		= [] (const std::string& group) { return core::Node::get_typed_nodes_in_group<core::Node2D>(group); };
+		= [] (const std::string& group) { return core::Node::get_nodes_in_group(group); };
+
+	env["as_2d_node"]
+		= [] (core::Node* node) { return dynamic_cast<core::Node2D*>(node); };
+
+	env["as_quadtree"]
+		= [] (core::Node* node) { return dynamic_cast<core::nodes::QuadTree2DNode*>(node); };
 
 	env.new_usertype<core::Node>("base",
 		"rename", &core::Node::rename,
+		"parent", &core::Node::parent,
 		"script", &core::Node::set_script,
+		"in_group", &core::Node::in_group,
 		"set_and_load_script", &core::Node::set_and_load_script,
 		"add_to_group", &core::Node::add_to_group,
 		"property", sol::overload(& core::Node::set_property, &core::Node::get_property),
@@ -47,8 +56,16 @@ static void setup_game_bindings(sol::state& env)
 
 	env.new_usertype<core::nodes::Sprite>("sprite",
 		"tile_index", sol::overload(&core::nodes::Sprite::set_tile_index, &core::nodes::Sprite::get_tile_index),
-		"new", [] (float tileIdx, float x, float y) { return core::Game::root()->new_child<core::nodes::Sprite>(tileIdx, x, y); },
+		"new", sol::overload(
+				[] (float tileIdx, float x, float y) { return core::Game::root()->new_child<core::nodes::Sprite>(tileIdx, x, y); },
+				[] (core::Node* parent, float tileIdx, float x, float y) { return parent->new_child<core::nodes::Sprite>(tileIdx, x, y); }
+			),
 		sol::base_classes, sol::bases<core::Node2D, core::Node>());
+
+	env.new_usertype<core::nodes::QuadTree2DNode>("quadtree",
+		"query", &core::nodes::QuadTree2DNode::query,
+		"new", [] (float x, float y, float w, float h, size_t capacity) { return core::Game::root()->new_child<core::nodes::QuadTree2DNode>(core::nodes::QuadTree2D::Boundary{x, y, w, h}, capacity); },
+		sol::base_classes, sol::bases<core::Node>());
 
 	auto vec_mult_overloads = sol::overload(
 		[] (const glm::vec2& a, const glm::vec2& b) -> glm::vec2 { return a * b; },

@@ -278,6 +278,10 @@ bool threads::on_my_thread(Reference& ref)
 {
 	//return true;
 	auto real_thread_id{ std::this_thread::get_id() };
+	if (ref.m_thread_id >= s_threads.size() || s_threads[ref.m_thread_id] == nullptr)
+	{
+		return false;
+	}
 	return real_thread_id == s_threads[ref.m_thread_id]->m_thread.get_id();
 }
 

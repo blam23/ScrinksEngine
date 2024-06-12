@@ -26,11 +26,10 @@ namespace scrinks::core
 		Node(Node* m_parent, threads::Group threadGroup = threads::Group::Split);
 		virtual ~Node();
 
-		constexpr static Node get_empty();
-
 	public:
 		std::vector<Node*>& children() { return m_children; }
 		const std::vector<Node*>& children() const { return m_children; }
+		Node* parent() const;
 		const char* name() const;
 		const char* type() const;
 		ID id() const { return m_id; }
@@ -38,6 +37,7 @@ namespace scrinks::core
 		void mark_for_deletion();
 		void mark_for_child_cleanup();
 		void add_to_group(const std::string& group);
+		bool in_group(const std::string& group) const;
 		
 		void set_script(std::shared_ptr<lua::Script> script);
 		void set_and_load_script(std::shared_ptr<lua::Script> script);
@@ -76,6 +76,8 @@ namespace scrinks::core
 		//
 		// NOT RECURSIVE
 		virtual void fixed_update();    // called at a fixed rate (per Game::TickRate)
+		virtual void child_added(Node&) {} // (just) became a child node
+		virtual void child_removed(Node&) {} // (about to be) removed as a child node
 		virtual void attached() {}      // (just) attached to a parent node
 		virtual void removed() {}       // (about to be) removed from parent node
 
@@ -92,7 +94,7 @@ namespace scrinks::core
 
 		// TODO: This whole group system is terrible, fix.
 		static void add_group(const std::string& name);
-		static const std::vector<Node*>& get_nodes_in_group(const std::string& name);
+		static std::vector<Node*> get_nodes_in_group(const std::string& name);
 
 		template <typename T_NODE>
 		static const std::vector<T_NODE*> get_typed_nodes_in_group(const std::string& name)
@@ -118,9 +120,9 @@ namespace scrinks::core
 		void run_func_checked(const std::string& func);
 		virtual void setup_script_data();
 		void load_script();
-		void cleanup_children();
 
 	private:
+		void cleanup_children();
 		void claim_child(Node& node);
 		void disown_child(Node& node);
 		void reload_script_if_outdated();
@@ -136,8 +138,10 @@ namespace scrinks::core
 		bool m_marked_for_deletion;
 		bool m_requires_cleanup;
 
-		Node* m_parent;
+		std::mutex m_property_mutex;
+		std::mutex m_child_mutex;
 		std::vector<Node*> m_children;
+		Node* m_parent;
 		std::shared_ptr<lua::Script> m_script;
 		std::string m_name;
 		std::uint16_t m_group{ 0 };

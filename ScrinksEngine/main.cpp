@@ -5,8 +5,7 @@ using namespace scrinks;
 
 int main()
 {
-
-    if (Window::init(1920, 1080, "Scrinks!", "examples/space/project.lua"))
+    if (Window::init(1240, 720, "Scrinks!", "examples/space/project.lua"))
         Window::run_loop();
     
     Window::shutdown();

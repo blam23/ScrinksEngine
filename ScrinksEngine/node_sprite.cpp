@@ -12,6 +12,7 @@ Sprite::Sprite(Node* parent, float tileIndex, float x, float y)
 
 	m_index = Game::sprite_renderer()->push(si);
 
+	std::lock_guard sprite_lock{ s_sprite_lock };
 	s_sprites.push_back(this);
 }
 
@@ -20,6 +21,7 @@ Sprite::~Sprite()
 	scrinks::render::SpriteInstance si{ -1000, -1000, -1 };
 	Game::sprite_renderer()->update_instance(m_index, si);
 
+	std::lock_guard sprite_lock{ s_sprite_lock };
 	s_sprites.erase(std::find(s_sprites.begin(), s_sprites.end(), this));
 }
 

@@ -12,7 +12,8 @@ end
 local screen_bound_buffer = 50
 
 function fixed_update()
-    self:translate(self:property("velocity") * self:property("move_speed") * fixed_delta)
+    local ms = self:property("move_speed")
+    self:translate(__props.velocity * ms * fixed_delta)
 
     local x, y = self:position()
     local w, h = view_size()

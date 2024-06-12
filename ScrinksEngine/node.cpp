@@ -39,6 +39,11 @@ Node::~Node()
 	}
 }
 
+Node* Node::parent() const
+{
+	return m_parent;
+}
+
 const char* Node::name() const
 {
 	return m_name.empty() ? default_name().data() : m_name.c_str();
@@ -61,8 +66,9 @@ void Node::add_group(const std::string& name)
 	s_groups.push_back({});
 }
 
-const std::vector<Node*>& scrinks::core::Node::get_nodes_in_group(const std::string& name)
+std::vector<Node*> scrinks::core::Node::get_nodes_in_group(const std::string& name)
 {
+	std::lock_guard lock{ s_group_mutex };
 	return s_groups[s_group_names[name]];
 }
 
@@ -120,6 +126,7 @@ void Node::cleanup_children()
 		}
 		else if (child->m_marked_for_deletion)
 		{
+			child_removed(**(m_children.begin() + i));
 			m_children.erase(m_children.begin() + i);
 			delete child;
 		}
@@ -183,6 +190,12 @@ void Node::add_to_group(const std::string& group)
 	std::lock_guard lock{ s_group_mutex };
 	m_group = s_group_names[group];
 	s_groups[m_group].push_back(this);
+}
+
+bool scrinks::core::Node::in_group(const std::string& group) const
+{
+	std::lock_guard lock{ s_group_mutex };
+	return m_group == s_group_names[group];
 }
 
 
@@ -253,8 +266,7 @@ void Node::set_and_load_script(std::shared_ptr<lua::Script> script)
 
 void Node::set_property(const std::string& name, const sol::object& value)
 {
-	//const auto id{ lua::send_to_shared(value) };
-	//m_shared[name] = id;
+	std::lock_guard lock{ m_property_mutex };
 
 	if (on_correct_thread())
 	{
@@ -270,6 +282,8 @@ void Node::set_property(const std::string& name, const sol::object& value)
 
 sol::object Node::get_property(const std::string& name)
 {
+	std::lock_guard lock{ m_property_mutex };
+
 	if (auto itr = m_data.find(name); itr != m_data.end())
 		return itr->second;
 
@@ -283,18 +297,24 @@ void Node::setup_script_data()
 
 void Node::claim_child(Node& node)
 {
+	std::lock_guard child_lock{ m_child_mutex };
+
 	if (node.m_parent != nullptr)
 		node.m_parent->disown_child(node);
 
 	m_children.push_back(&node);
 	node.m_parent = this;
 	node.attached();
+	child_added(node);
 }
 
 void Node::disown_child(Node& child)
 {
+	std::lock_guard child_lock{ m_child_mutex };
+
 	auto it = std::find(m_children.begin(), m_children.end(), &child);
 	if (it != m_children.end()) {
+		child_removed(**it);
 		m_children.erase(it);
 	}
 }

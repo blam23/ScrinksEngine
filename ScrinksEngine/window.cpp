@@ -105,6 +105,10 @@ bool Window::setup_glfw(int width, int height, const std::string& name)
     glDebugMessageCallback(errors::gl_print_error_callback, &s_log_level);
     glEnable(GL_DEBUG_OUTPUT);
 
+    int xpos, ypos, mWidth, mHeight;
+    glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), &xpos, &ypos, &mWidth, &mHeight);
+    glfwSetWindowPos(s_window, xpos + (mWidth / 2) - (width / 2), ypos + (mHeight / 2) - (height / 2));
+
     return true;
 }
 

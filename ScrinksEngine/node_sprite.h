@@ -27,6 +27,7 @@ namespace scrinks::core::nodes
 		std::size_t m_index;
 		float m_tileIndex;
 
+		static inline std::mutex s_sprite_lock{};
 		static inline std::vector<Sprite*> s_sprites{};
 	};
 }

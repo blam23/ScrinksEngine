@@ -9,6 +9,8 @@ __props = {
 
 local screen_bound_buffer = 30
 local hit_radius = 10
+local hit_width = 30
+local hit_height = 30
 
 function fixed_update()
     self:translate(self:property("velocity") * self:property("move_speed") * fixed_delta)
@@ -21,11 +23,9 @@ function fixed_update()
     end
 
     if self:property("hit_enemy") then
-        local enemies = get_nodes_in_group("enemies")
+        local enemies = as_quadtree(self:parent()):query(x-hit_width/2,y-hit_height/2,hit_width,hit_height)
         for i = 1, #enemies do
-            local px, py = enemies[i]:position()
-            local dist2 = (px - x) * (px - x) + (py - y) * (py - y)
-            if dist2 < hit_radius * hit_radius then
+            if enemies[i]:in_group("enemies") then
                 self:mark_for_deletion()
                 enemies[i]:mark_for_deletion()
             end
