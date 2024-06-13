@@ -195,9 +195,8 @@ std::uint8_t assign_thread(threads::Group group)
 	case threads::Group::Background:
 		return threads::BackgroundThreadID;
 	case threads::Group::Split:
-		if (lastBucket >= s_threads.size())
-			lastBucket = 2;
-		return lastBucket++;
+		uint8_t ret{ lastBucket++ };
+		return (ret % (s_threads.size() - 2)) + 2;
 	}
 
 	return 0;
