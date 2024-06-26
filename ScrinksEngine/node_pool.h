@@ -1,55 +1,45 @@
 #pragma once
 
-#ifdef NODE_POOL_TEST
+#include "node.h"
 
-#include "helpers.h"
-#include <array>
+#include <list>
 
 namespace scrinks::core
 {
-	// Not thread safe - should be used per thread instead.
-	template <class T, size_t Size>
-	class Pool
+	template <typename T_Node, typename = std::enable_if_t<std::is_base_of<scrinks::core::Node, T_Node>::value>>
+	class NodePool
 	{
 	public:
-		DISABLE_COPY_AND_MOVE(Pool);
-
-		Pool() {}
-
-		template <
-			class... T_Args,
-			typename = std::enable_if_t<std::is_base_of<Node, T>::value>
-		>
-		std::pair<size_t, T*> reserve(T_Args&&... args)
+		template <class... T_Args>
+		static T_Node* get(T_Args&&... args)
 		{
-			const auto ptr{ get_next() };
-			T* ret{ &m_storage[ptr] };
-			std::construct_at(ret, args...);
-			return { ptr, ret };
+			std::lock_guard lock{ s_node_list_lock };
+
+			auto ptr{ s_free_nodes.begin() };
+			if (ptr == s_free_nodes.end())
+				return allocate(std::forward<T_Args>(args)...);
+
+			const auto ret{ std::construct_at(*ptr, std::forward<T_Args>(args)...) };
+			s_free_nodes.pop_front();
+			return ret;
 		}
 
-		void release(size_t idx)
+		static void release(T_Node* node)
 		{
-			m_free.push_back(idx);
+			std::lock_guard lock{ s_node_list_lock };
+
+			std::destroy_at(node);
+			s_free_nodes.push_back(node);
 		}
-		
+
 	private:
-		size_t get_next()
+		inline static std::mutex s_node_list_lock{};
+		inline static std::list<T_Node*> s_free_nodes{};
+
+		template <class... T_Args>
+		static T_Node* allocate(T_Args&&... args)
 		{
-			if (m_free.size() > 0)
-			{
-				size_t ret{ m_free.front() };
-				m_free.pop_front();
-				return ret;
-			}
-
-			return m_ptr++;
+			return new T_Node(std::forward<T_Args>(args)...);
 		}
-
-		T m_storage[Size]{};
-		std::list<size_t> m_free{};
-		size_t m_ptr;
 	};
 }
-
-#endif

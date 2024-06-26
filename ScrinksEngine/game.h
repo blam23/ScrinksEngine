@@ -15,7 +15,7 @@ namespace scrinks::core
 
 	public:
 		// Fixed state tick rates
-		constexpr static std::uint16_t TickRate = 60;
+		constexpr static std::uint16_t TickRate = 25;
 		constexpr static std::uint16_t SkipRate = 1000 / TickRate;
 		constexpr static std::uint16_t MaxFrameSkip = 5;
 

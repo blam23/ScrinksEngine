@@ -25,6 +25,11 @@ Sprite::~Sprite()
 	s_sprites.erase(std::find(s_sprites.begin(), s_sprites.end(), this));
 }
 
+void Sprite::release()
+{
+	NodePool<Sprite>::release(this);
+}
+
 void Sprite::fill_sprite_data(scrinks::render::SpriteInstance& out, float interpolate) const
 {
 	Transform2D tf;
@@ -38,9 +43,8 @@ void Sprite::fill_sprite_data(scrinks::render::SpriteInstance& out, float interp
 
 void Sprite::setup_script_data()
 {
-	m_script_env["self"] = this;
-
 	Node2D::setup_script_data();
+	m_script_env["self"] = this;
 }
 
 //void Sprite::fixed_update()

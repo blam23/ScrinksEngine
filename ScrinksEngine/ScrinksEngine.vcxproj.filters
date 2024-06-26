@@ -331,7 +331,7 @@
     <ClInclude Include="project.h">
       <Filter>core\headers</Filter>
     </ClInclude>
-    <ClInclude Include="node_pool.h">
+    <ClInclude Include="_node_pool.h">
       <Filter>core\headers</Filter>
     </ClInclude>
     <ClInclude Include="lua_class.h">
@@ -345,6 +345,9 @@
     </ClInclude>
     <ClInclude Include="node_2d_quadtree.h">
       <Filter>core\nodes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="node_pool.h">
+      <Filter>core\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

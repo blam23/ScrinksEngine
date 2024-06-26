@@ -11,6 +11,8 @@ namespace scrinks::core::nodes
 		Sprite(Node* parent, float tileIndex, float x, float y);
 		virtual ~Sprite();
 
+		virtual void release() override;
+
 		void set_tile_index(float tileIndex) { m_tileIndex = tileIndex; }
 		float get_tile_index() const { return m_tileIndex; }
 		float* tile_index_ptr() { return &m_tileIndex; }

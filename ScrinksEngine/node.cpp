@@ -24,6 +24,11 @@ Node::Node(Node* parent, threads::Group threadGroup)
 		parent->claim_child(*this);
 }
 
+void Node::release()
+{
+	NodePool<Node>::release(this);
+}
+
 Node::~Node()
 {
 	if (m_group != 0)
@@ -34,8 +39,13 @@ Node::~Node()
 
 	for (Node* node : m_children)
 	{
+		//if (node)
+		//	delete node;
+
 		if (node)
-			delete node;
+		{
+			node->release();
+		}
 	}
 }
 
@@ -66,7 +76,7 @@ void Node::add_group(const std::string& name)
 	s_groups.push_back({});
 }
 
-std::vector<Node*> scrinks::core::Node::get_nodes_in_group(const std::string& name)
+std::vector<Node*> Node::get_nodes_in_group(const std::string& name)
 {
 	std::lock_guard lock{ s_group_mutex };
 	return s_groups[s_group_names[name]];
@@ -83,7 +93,7 @@ void Node::run_func_checked(const std::string& func)
 			sol::function_result res{ luaFunc() };
 			if (!res.valid())
 			{
-				sol::error msg = res;
+				const sol::error msg = res;
 				spdlog::error("Error calling func <{}>, error: {}", func, msg.what());
 			}
 		}
@@ -128,7 +138,7 @@ void Node::cleanup_children()
 		{
 			child_removed(**(m_children.begin() + i));
 			m_children.erase(m_children.begin() + i);
-			delete child;
+			child->release();
 		}
 		else
 		{
@@ -192,7 +202,7 @@ void Node::add_to_group(const std::string& group)
 	s_groups[m_group].push_back(this);
 }
 
-bool scrinks::core::Node::in_group(const std::string& group) const
+bool Node::in_group(const std::string& group) const
 {
 	std::lock_guard lock{ s_group_mutex };
 	return m_group == s_group_names[group];
@@ -205,6 +215,11 @@ void Node::mark_for_deletion()
 
 	if (m_parent)
 		m_parent->mark_for_child_cleanup();
+}
+
+bool Node::is_marked_for_deletion() const
+{
+	return m_marked_for_deletion;
 }
 
 void Node::load_script()

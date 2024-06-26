@@ -12,8 +12,8 @@ Node3D::Node3D(Node* parent, const Transform& position)
 
 void scrinks::core::Node3D::setup_script_data()
 {
-	m_script_env["self"] = this;
 	Node::setup_script_data();
+	m_script_env["self"] = this;
 }
 
 void Node3D::sync_fixed_update()

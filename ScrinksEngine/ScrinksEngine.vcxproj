@@ -189,6 +189,7 @@
     <ClCompile Include="node.cpp" />
     <ClCompile Include="node_2d.cpp" />
     <ClCompile Include="node_2d_quadtree.cpp" />
+    <ClInclude Include="node_pool.h" />
     <ClInclude Include="node_2d_quadtree.h" />
     <ClCompile Include="node_model.cpp" />
     <ClCompile Include="node_root.cpp" />
@@ -241,7 +242,7 @@
     <ClInclude Include="node.h" />
     <ClInclude Include="node_2d.h" />
     <ClInclude Include="node_model.h" />
-    <ClInclude Include="node_pool.h" />
+    <ClInclude Include="_node_pool.h" />
     <ClInclude Include="node_root.h" />
     <ClInclude Include="node_sprite.h" />
     <ClInclude Include="pass_environment_map.h" />

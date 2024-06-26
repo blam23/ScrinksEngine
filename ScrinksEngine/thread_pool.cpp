@@ -102,8 +102,6 @@ struct AssignableThread
 	std::size_t m_index;
 };
 
-AssignableThread* mainThread;
-AssignableThread* backgroundThread;
 std::vector<std::unique_ptr<AssignableThread>> s_threads{};
 std::vector<std::size_t> s_entityCounts{};
 
@@ -158,19 +156,12 @@ void threads::setup()
 	const auto concurrency{ std::thread::hardware_concurrency() };
 	//const auto concurrency{ 4 };
 
-	add_thread();
-	add_thread();
-
-	mainThread = s_threads[0].get();
-	backgroundThread = s_threads[1].get();
-
-	set_thread_priority(mainThread, Priority::High);
-	set_thread_priority(backgroundThread, Priority::Normal);
-
-	for (std::uint32_t i = 0; i < concurrency - 2; i++)
+	for (std::uint32_t i = 0; i < concurrency; i++)
 		add_thread();
 
 	gameWindowThread = std::this_thread::get_id();
+
+	SetThreadPriority(GetCurrentThread(), HIGH_PRIORITY_CLASS);
 }
 
 void threads::shutdown()
@@ -184,9 +175,8 @@ void threads::shutdown()
 		thread->m_thread.join();
 }
 
-// TODO: Realistically this should track counts and add to lowest.
-std::atomic<std::uint8_t> lastBucket{ 2 };
-std::uint8_t assign_thread(threads::Group group)
+std::atomic<uint8_t> lastBucket{ 0 };
+uint8_t assign_thread(threads::Group group)
 {
 	switch (group)
 	{
@@ -195,8 +185,7 @@ std::uint8_t assign_thread(threads::Group group)
 	case threads::Group::Background:
 		return threads::BackgroundThreadID;
 	case threads::Group::Split:
-		uint8_t ret{ lastBucket++ };
-		return (ret % (s_threads.size() - 2)) + 2;
+		return lastBucket++ % s_threads.size();
 	}
 
 	return 0;
@@ -279,6 +268,7 @@ bool threads::on_my_thread(Reference& ref)
 	auto real_thread_id{ std::this_thread::get_id() };
 	if (ref.m_thread_id >= s_threads.size() || s_threads[ref.m_thread_id] == nullptr)
 	{
+		spdlog::error("[tid={}] [#t={}] [ptr={}]", ref.m_thread_id, s_threads.size(), (void*)s_threads[ref.m_thread_id].get());
 		return false;
 	}
 	return real_thread_id == s_threads[ref.m_thread_id]->m_thread.get_id();

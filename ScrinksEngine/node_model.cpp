@@ -18,7 +18,7 @@ void DynamicModel::draw(std::shared_ptr<render::Shader> shader, float interpolat
 
 void DynamicModel::setup_script_data()
 {
-	m_script_env["self"] = this;
 	Node3D::setup_script_data();
+	m_script_env["self"] = this;
 }
 

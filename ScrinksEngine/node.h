@@ -4,6 +4,7 @@
 #include "script.h"
 #include "lua_engine.h"
 #include "thread_pool.h"
+#include "node_pool.h"
 #include <vector>
 #include <cstdint>
 #include <string>
@@ -25,6 +26,7 @@ namespace scrinks::core
 
 		Node(Node* m_parent, threads::Group threadGroup = threads::Group::Split);
 		virtual ~Node();
+		virtual void release();
 
 	public:
 		std::vector<Node*>& children() { return m_children; }
@@ -35,6 +37,7 @@ namespace scrinks::core
 		ID id() const { return m_id; }
 		void rename(const std::string& name) { m_name = name; }
 		void mark_for_deletion();
+		bool is_marked_for_deletion() const;
 		void mark_for_child_cleanup();
 		void add_to_group(const std::string& group);
 		bool in_group(const std::string& group) const;
@@ -56,7 +59,7 @@ namespace scrinks::core
 		>
 		T_Node* new_child(T_Args&&... args)
 		{
-			return new T_Node(this, std::forward<T_Args>(args)...);
+			return NodePool<T_Node>::get(this, std::forward<T_Args>(args)...);
 		}
 
 		template <typename T>
@@ -135,8 +138,8 @@ namespace scrinks::core
 		threads::Reference m_thread;
 
 	private:
-		bool m_marked_for_deletion;
-		bool m_requires_cleanup;
+		bool m_marked_for_deletion{ false };
+		bool m_requires_cleanup{ false };
 
 		std::mutex m_property_mutex;
 		std::mutex m_child_mutex;
@@ -146,7 +149,7 @@ namespace scrinks::core
 		std::string m_name;
 		std::uint16_t m_group{ 0 };
 		ID m_id;
-		bool m_init_lua;
+		bool m_init_lua{ false };
 		bool m_has_fixed_update{ false };
 		bool m_has_sync_fixed_update{ false };
 		std::map<std::string, sol::object> m_data;

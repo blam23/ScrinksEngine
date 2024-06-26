@@ -47,6 +47,7 @@ static void setup_game_bindings(sol::state& env)
 		"set_and_load_script", &core::Node::set_and_load_script,
 		"add_to_group", &core::Node::add_to_group,
 		"property", sol::overload(& core::Node::set_property, &core::Node::get_property),
+		"is_marked_for_deletion", &core::Node::is_marked_for_deletion,
 		"mark_for_deletion", &core::Node::mark_for_deletion);
 
 	env.new_usertype<core::Node2D>("node2D",
